@@ -4,7 +4,8 @@ export const SidebarData = [
   {
     title: "Home",
     icon: "<AiFillHome />",
-    Link: "/",
+    link: "/",
+
   }
     ,
     {

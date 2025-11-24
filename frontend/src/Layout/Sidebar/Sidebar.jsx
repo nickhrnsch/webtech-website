@@ -13,7 +13,6 @@ function Sidebar() {
           );
         })}
       </ul>
-
     </div>
   );
 }
