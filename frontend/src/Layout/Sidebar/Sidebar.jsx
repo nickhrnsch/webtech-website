@@ -10,7 +10,10 @@ function Sidebar() {
       <ul>
         {SidebarData.map((item, index) => {
           return (
-            <button key={index} className="sidebar-button">{item.title}</button>
+            <button key={index} className="sidebar-button">
+              {item.icon && <img src={item.icon} alt={item.title} className="sidebar-icon" />}
+              {item.title}
+            </button>
           );
         })}
       </ul>
