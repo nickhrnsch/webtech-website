@@ -6,7 +6,7 @@ import SidebarProfile from "./SidebarProfile";
 function Sidebar() {
   return (
     <div className="sidebar">
-      <h2>Sidebar</h2>
+      <h2>Urlaubsplaner</h2>
       <ul>
         {SidebarData.map((item, index) => {
           return (
