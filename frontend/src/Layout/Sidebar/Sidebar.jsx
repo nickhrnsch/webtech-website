@@ -1,6 +1,7 @@
 import React from "react";
 import { SidebarData } from "./SidebarData";
 import "./SidebarStyle.css";
+import SidebarProfile from "./SidebarProfile";
 
 function Sidebar() {
   return (
@@ -9,10 +10,13 @@ function Sidebar() {
       <ul>
         {SidebarData.map((item, index) => {
           return (
-            <li key={index}>{item.title}</li>
+            <button key={index} className="sidebar-button">{item.title}</button>
           );
         })}
       </ul>
+      <div className="sidebar-profile-section">
+      <SidebarProfile />
+      </div>
     </div>
   );
 }
