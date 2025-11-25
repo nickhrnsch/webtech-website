@@ -14,4 +14,7 @@ export const SidebarData = [
   {     
     title: "Test",
     },
+  {
+    title: "Contact",
+  }
 ];
