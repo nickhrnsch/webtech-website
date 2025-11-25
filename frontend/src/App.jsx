@@ -8,7 +8,6 @@ function App() {
   return (
     <>
       <Sidebar />
-      <h1>I love Beer</h1>
     </>
   );
 }
