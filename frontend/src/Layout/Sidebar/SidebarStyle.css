@@ -2,7 +2,7 @@
 
 .sidebar{
     width: 18%;
-    min-width: 180px;
+    min-width: 170px;
     height: 100vh;
     background-color: #ffffff;
     padding: 20px;
@@ -32,7 +32,6 @@
 .sidebar-button {
     width: 90%;
     padding: 15px;
-    margin: 0;
     background-color: #f8f9fa;
     border: 1px solid #e9ecef;
     border-radius: 12px;
@@ -72,6 +71,7 @@
     align-items: center;
     justify-content: center;
     /* Inhalt wird zentriert im Profilbereich angezeigt */
+    cursor: pointer;
     gap: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     border: 1px solid #e9ecef;
