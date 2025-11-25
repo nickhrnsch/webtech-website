@@ -7,10 +7,12 @@ import Fenster from './Layout/Fenster/Fenster.jsx'
 function App() {
 
   return (
-    <>
+    <div className="app-container">
       <Sidebar />
-      <Fenster title="Welcome to Urlaubsplaner"></Fenster>
-    </>
+      <div className="widget-grid">
+
+      </div>
+    </div>
   );
 }
 

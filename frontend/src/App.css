@@ -1,1 +1,5 @@
-
+.widget-grid {
+    background-color: bisque;
+    border: 1px solid #000000;
+    width: 0px;
+}

@@ -1,21 +1,10 @@
 .fenster-container {
+    border: 1px solid #000000;
+    min-width: 300px;
+    min-height: 250px;
     display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: calc(100% - 18%);
-    margin-left: 18%;
-    background-color: #ffffff;
-}
-.fenster-header {
-    padding: 20px;
-    background-color: #f1f3f5;
-    border-bottom: 1px solid #e9ecef;
-    font-size: 24px;
-    font-weight: bold;
-    color: #2c3e50;
-}
-.fenster-content {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
     flex: 1;
-    padding: 20px;
-    overflow-y: auto;
 }
