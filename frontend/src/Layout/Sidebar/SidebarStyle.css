@@ -2,13 +2,14 @@
 
 .sidebar{
     width: 18%;
-    min-width: 170px;
+    min-width: 200px;
     height: 100vh;
     background-color:#f9f9f9;
     padding: 20px;
     color: rgb(0, 0, 0);
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    /* box-shadow: 2px 0 5px rgba(0,0,0,0.1); */
     position: fixed;
+    overflow: hidden;
     top: 0;
     left: 0;
     display: flex;
@@ -16,6 +17,30 @@
     align-items: center;
     gap: 15px;
     justify-content: space-between;
+}
+
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    width: 90%;
+    justify-content: flex-start;
+    padding-left: 5%;
+}
+
+.sidebar-header-icon {
+    width: 32px;
+    height: 32px;
+}
+
+.sidebar h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color:#2c3e50;
+    text-align: center;
+
 }
 
 .sidebar ul {
@@ -35,9 +60,9 @@
     background-color:#f9f9f9;
     border-radius: 12px;
     text-align: center;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 600;
-    color:#000000;
+    color:#2c3e50;
     cursor: pointer;
     transition: all 0.3s ease;
     overflow: hidden;
@@ -69,16 +94,17 @@
 /* ---------------------------User-Profile--------------------------------- */
 
 .sidebar-user-profile {
-    width: 90%;
+    width: 98%;
     margin-top: auto;
     margin-bottom: 40px;
     padding: 15px;
-    background-color: #f8f9fa;
+    background-color: #ffffff;
     border-radius: 12px;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: center;
+    justify-content: left;
+    padding-left: 10%;
     /* Inhalt wird zentriert im Profilbereich angezeigt */
     cursor: pointer;
     gap: 12px;
@@ -136,4 +162,21 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     transition: all 0.3s ease;
     border: 1px solid #667eea;
+}
+
+.sidebar-user-profile:focus {
+    outline: none;
+    border-color:#667eea;
+    box-shadow: 0 0 0 3px #667eea38;
+}
+
+/* ---------------------------Icon--------------------------------- */
+
+.sidebar-icon {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    justify-content: left;
+    display: flex;
+    flex-direction: row;
 }

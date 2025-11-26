@@ -16,8 +16,12 @@ export const SidebarData = [
   },
   {     
     title: "Test",
+    icon: new URL('./SidebarIcons/LupeIcon.png', import.meta.url).href,
+    link: "/",
     },
   {
     title: "Contact",
+    icon: new URL('./SidebarIcons/KontaktIcon.png', import.meta.url).href,
+    link: "/",
   }
 ];

@@ -2,12 +2,15 @@ import React from "react";
 import "./SidebarStyle.css";
 import { SidebarData } from "./SidebarData";
 import SidebarProfile from "./SidebarProfile";
+import CalenderIcon from "./SidebarIcons/CalenderIcon.png";
 
 function Sidebar() {
   return (
     <div className="sidebar">
-      <img src="frontend\src\Layout\Sidebar\SidebarIcons\CalenderIcon.png" alt="" />
-      <h2>Urlaubsplaner</h2>
+      <div className="sidebar-header">
+        <img src={CalenderIcon} alt="Kalender" className="sidebar-header-icon" />
+        <h2>Urlaubsplaner</h2>
+      </div>
       <ul>
         {SidebarData.map((item, index) => {
           return (

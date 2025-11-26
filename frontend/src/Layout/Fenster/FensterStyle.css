@@ -1,10 +1,11 @@
 .fenster-container {
-    border: 1px solid #000000;
-    min-width: 300px;
-    min-height: 250px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    flex: 1;
+    position: fixed;
+    top: 20px;
+    margin-bottom: 20px;
+    left: max(20%, 260px);
+    height: 96vh;
+    width: 79vw;
+    background-color:#000000; /* Farbe Schwarz damit man es erkennt, später helgrau wie sidebar */
+    border-radius: 26px;
+    overflow: auto;
 }

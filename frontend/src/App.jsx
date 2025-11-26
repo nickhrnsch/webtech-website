@@ -9,9 +9,9 @@ function App() {
   return (
     <div className="app-container">
       <Sidebar />
-      <div className="widget-grid">
 
-      </div>
+      <Fenster title="Hier Widgets einfügen" />
+
     </div>
   );
 }
