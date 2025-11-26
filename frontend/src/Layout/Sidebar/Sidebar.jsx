@@ -6,6 +6,7 @@ import SidebarProfile from "./SidebarProfile";
 function Sidebar() {
   return (
     <div className="sidebar">
+      <img src="frontend\src\Layout\Sidebar\SidebarIcons\CalenderIcon.png" alt="" />
       <h2>Urlaubsplaner</h2>
       <ul>
         {SidebarData.map((item, index) => {
