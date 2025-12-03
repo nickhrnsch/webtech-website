@@ -1,11 +1,113 @@
 .fenster-container {
-    position: fixed;
-    top: 20px;
-    margin-bottom: 20px;
-    left: max(20%, 260px);
-    height: 96vh;
-    width: 79vw;
-    background-color:#000000; /* Farbe Schwarz damit man es erkennt, später helgrau wie sidebar */
-    border-radius: 26px;
-    overflow: auto;
+  position: fixed;
+  top: 20px;
+  left: max(20%, 260px);
+  right: 20px;
+  bottom: 20px;
+  border-radius: 26px;
+  background-color: #000000;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow: auto;
+
+  /* neu: Container als Spalten-Flex, damit der Grid-Bereich die verbleibende Höhe einnimmt */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Widget-Grid: flexibel und responsive */
+.fenster-widget-area {
+  display: grid;
+  gap: 16px;
+
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+
+  /* Höhe begrenzen, damit die 2x2-Zellen nicht riesig werden.
+     Passe 60vh / 720px nach Geschmack an. */
+  height: min(60vh, 720px);
+  max-height: 720px;
+
+  width: 100%;
+}
+
+/* Items füllen ihre Zelle, erlauben aber inneres Scrollen */
+.fenster-widget-area > * {
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  height: 100%;
+  min-height: 140px; /* verhindert zu kleine Karten */
+}
+
+/* weniger hartes Weiß + etwas dezenter Rahmen */
+.widget-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  /* weißer Hintergrund + schwarzer Text */
+  background: #f9f9f9;
+  color: #2c3e50;
+
+  border-radius: 8px;
+  padding: 12px;
+  box-sizing: border-box;
+
+  /* dezente Abgrenzung */
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  overflow: hidden;
+}
+
+/* Kopf der Karte bleibt sichtbar (Titel schwarz) */
+.widget-header {
+  flex: 0 0 auto;
+}
+.widget-header .widget-title {
+  margin: 0;
+  color: #000000;
+}
+
+/* Scrollbarer Body (Text schwarz, bricht um) */
+.widget-body {
+  flex: 1 1 auto;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-top: 8px;
+  color: #000000;
+}
+
+/* Sicherstellen, dass Kinder innerhalb schrumpfen und Zeilen nicht ausbrechen */
+.fenster-widget-area > * {
+  min-width: 0;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+/* Text-Handling */
+.widget-body,
+.widget-body p {
+  word-break: break-word;
+}
+
+/* Responsive Fallback (kleine Bildschirme) */
+@media (max-width: 700px) {
+  .fenster-container {
+    position: static;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: auto;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+  }
+
+  .fenster-widget-area {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+  }
 }

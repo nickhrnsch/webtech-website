@@ -1,0 +1,17 @@
+.widget-container {
+  background: white;
+  color: black;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.widget-header {
+  margin-bottom: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.widget-body {
+  padding-top: 8px;
+}
