@@ -10,12 +10,14 @@
   box-sizing: border-box;
   overflow: auto;
 
-  /* neu: Container als Spalten-Flex, damit der Grid-Bereich die verbleibende Höhe einnimmt */
+  /* Container als Spalten-Flex, damit Header + Grid verteilt werden */
   display: flex;
   flex-direction: column;
+  /* wichtig für korrektes Shrinking */
+  min-height: 0;
 }
 
-/* Widget-Grid: flexibel und responsive */
+/* Widget-Grid: genau 2x2, füllt verbleibende Höhe */
 .fenster-widget-area {
   display: grid;
   gap: 16px;
@@ -23,11 +25,9 @@
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
 
-  /* Höhe begrenzen, damit die 2x2-Zellen nicht riesig werden.
-     Passe 60vh / 720px nach Geschmack an. */
-  height: min(60vh, 720px);
-  max-height: 720px;
-
+  /* nimmt den restlichen Platz im .fenster-container ein */
+  flex: 1 1 auto;
+  min-height: 0;
   width: 100%;
 }
 
