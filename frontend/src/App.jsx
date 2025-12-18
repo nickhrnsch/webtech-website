@@ -4,6 +4,8 @@ import "./App.css";
 import Sidebar from "./Layout/Sidebar/Sidebar.jsx";
 import Fenster from "./Layout/Fenster/Fenster";
 import TextWidget from "./Layout/Widgets/TextWidget";
+import Widget from "./Layout/Widgets/Widget";
+import Kalender from "./Features/Kalender/Kalender";
 
 function App() {
   return (
@@ -11,7 +13,9 @@ function App() {
       <Sidebar />
 
       <Fenster title="Dashboard">
-        <TextWidget title="Meine Textwidget 1" text="Hier steht ein Text" />
+        <Widget title="Kalender">
+          <Kalender />
+        </Widget>
         <TextWidget title="Meine Textwidget 2" text="Hier steht ein Text" />
         <TextWidget
           title="Meine Textwidget 2"

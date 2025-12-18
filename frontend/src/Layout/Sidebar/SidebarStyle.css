@@ -236,6 +236,7 @@
     justify-content: center;
     transition: background 0.2s ease;
     line-height: 1;
+    padding-bottom: 17px;
 }
 
 .profile-popup-close:hover {
