@@ -35,7 +35,7 @@ function SidebarProfile() {
                 <button className="sidebar-user-profile" onClick={handleClick}>
                     <div className="user-avatar">
                         <img 
-                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=667eea&color=fff&size=48`}
+                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=1976d2&color=fff&size=48`}
                             alt="User Avatar" 
                         />
                     </div>
@@ -54,7 +54,7 @@ function SidebarProfile() {
                     <div className="profile-popup-body">
                         <div className="profile-avatar-large">
                             <img 
-                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=667eea&color=fff&size=100`}
+                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=1976d2&color=fff&size=100`}
                                 alt="User Avatar" 
                             />
                         </div>
