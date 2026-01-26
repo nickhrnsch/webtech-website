@@ -14,15 +14,22 @@ function Sidebar() {
       <ul>
         {SidebarData.map((item, index) => {
           return (
-            <button key={index} className="sidebar-button">
-              {item.icon && <img src={item.icon} alt={item.title} className="sidebar-icon" />}
+            <button 
+              key={index} 
+              className="sidebar-button"
+            >
+              {item.type === "image" ? (
+                <img src={item.icon} alt={item.title} className="sidebar-icon" />
+              ) : (
+                <item.icon className="sidebar-icon" style={{ fontSize: 24 }} />
+              )}
               {item.title}
             </button>
           );
         })}
       </ul>
       <div className="sidebar-profile-section">
-      <SidebarProfile />
+        <SidebarProfile />
       </div>
     </div>
   );
