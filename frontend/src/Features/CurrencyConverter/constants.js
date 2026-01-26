@@ -40,8 +40,5 @@ export const POPULAR_CURRENCIES = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AU
 export const DEFAULT_FROM_CURRENCY = 'EUR';
 export const DEFAULT_TO_CURRENCY = 'USD';
 
-// LocalStorage Key für Favoriten
-export const FAVORITES_STORAGE_KEY = 'currencyConverterFavorites';
-
 // API Base URL
 export const API_BASE_URL = 'https://api.frankfurter.app';

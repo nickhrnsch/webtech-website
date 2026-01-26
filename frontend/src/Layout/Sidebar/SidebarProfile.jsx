@@ -1,26 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './SidebarStyle.css';
+import { useAuth } from '../../context/AuthContext';
+import { getProfile, updateProfile } from '../../services/userService';
 
 function SidebarProfile() {
-// Zustand für die Anzeige des Popups
+    const { user, logout } = useAuth();
     const [showPopup, setShowPopup] = useState(false);
-// Profildaten änderbar machen und Defaultwerte setzen
     const [profileData, setProfileData] = useState({
-        name: 'Max Mustermann',
-        email: 'max.m@example.com',
-        abteilung: 'IT'
+        name: '',
+        email: '',
+        abteilung: ''
     });
-  
-// Funktionen zum Öffnen und Schließen des Popups
+    const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+
+    // Lade Profildaten beim Öffnen des Popups oder wenn User sich ändert
+    useEffect(() => {
+        if (user) {
+            setProfileData({
+                name: user.name || '',
+                email: user.email || '',
+                abteilung: user.abteilung || ''
+            });
+        }
+    }, [user]);
+
+    // Lade Profildaten vom Backend wenn Popup geöffnet wird
+    useEffect(() => {
+        if (showPopup && user) {
+            loadProfile();
+        }
+    }, [showPopup, user]);
+
+    const loadProfile = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const profile = await getProfile();
+            setProfileData({
+                name: profile.name || '',
+                email: profile.email || '',
+                abteilung: profile.abteilung || ''
+            });
+        } catch (err) {
+            setError('Fehler beim Laden des Profils');
+            console.error('Profile Load Error:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleClick = () => {
         setShowPopup(true);
     };
 
     const closePopup = () => {
         setShowPopup(false);
+        setError('');
+        setSuccess('');
     };
 
-// Funktion zum Aktualisieren der Profildaten
     const handleInputChange = (field, value) => {
         setProfileData(prev => ({
             ...prev,
@@ -28,69 +69,162 @@ function SidebarProfile() {
         }));
     };
 
+    const handleSave = async () => {
+        setSaving(true);
+        setError('');
+        setSuccess('');
+        
+        try {
+            await updateProfile(profileData);
+            setSuccess('Profil erfolgreich gespeichert!');
+            // Aktualisiere User im AuthContext durch erneutes Laden
+            setTimeout(() => {
+                loadProfile();
+            }, 500);
+        } catch (err) {
+            setError(err.message || 'Fehler beim Speichern des Profils');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    if (!user) {
+        return null;
+    }
+
+    const displayName = profileData.name || user.username || 'User';
+    const displayEmail = profileData.email || user.email || '';
+
     return (
-      // Sidebar Profilbereich mit Popup für detaillierte Ansicht und Bearbeitung
         <div className={`sidebar-profile-container ${showPopup ? 'expanded' : ''}`}>
             {!showPopup ? (
                 <button className="sidebar-user-profile" onClick={handleClick}>
                     <div className="user-avatar">
                         <img 
-                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=1976d2&color=fff&size=48`}
+                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1976d2&color=fff&size=48`}
                             alt="User Avatar" 
                         />
                     </div>
                     <div className="user-info">
-                        <span className="user-name">{profileData.name}</span>
+                        <span className="user-name">{displayName}</span>
                         <span className="user-status">Online</span>
                     </div>
                 </button>
             ) : (
-              // Erweiterte Profilansicht mit Bearbeitungsmöglichkeiten
                 <div className="profile-popup-expanded">
                     <div className="profile-popup-header">
                         <h3>Mein Profil</h3>
                         <button className="profile-popup-close" onClick={closePopup}>×</button>
                     </div>
                     <div className="profile-popup-body">
-                        <div className="profile-avatar-large">
-                            <img 
-                                src={`https://ui-avatars.com/api/?name=${encodeURIComponent(profileData.name)}&background=1976d2&color=fff&size=100`}
-                                alt="User Avatar" 
-                            />
-                        </div>
-                        <div className="profile-details">
-                            <div className="profile-detail-item">
-                                <strong>Name:</strong>
-                                <input 
-                                    type="text"
-                                    value={profileData.name} 
-                                    onChange={(e) => handleInputChange('name', e.target.value)}
-                                    className="profile-input"
-                                />
-                            </div>
-                            <div className="profile-detail-item">
-                                <strong>E-Mail:</strong>
-                                <input 
-                                    type="email"
-                                    value={profileData.email} 
-                                    onChange={(e) => handleInputChange('email', e.target.value)}
-                                    className="profile-input"
-                                />
-                            </div>
-                            <div className="profile-detail-item">
-                                <strong>Abteilung:</strong>
-                                <input 
-                                    type="text"
-                                    value={profileData.abteilung} 
-                                    onChange={(e) => handleInputChange('abteilung', e.target.value)}
-                                    className="profile-input"
-                                />
-                            </div>
-                            <div className="profile-detail-item">
-                                <strong>Status:</strong>
-                                <span className="status-online">Online</span>
-                            </div>
-                        </div>
+                        {loading ? (
+                            <div style={{ textAlign: 'center', padding: '20px' }}>Lädt...</div>
+                        ) : (
+                            <>
+                                <div className="profile-avatar-large">
+                                    <img 
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1976d2&color=fff&size=100`}
+                                        alt="User Avatar" 
+                                    />
+                                </div>
+                                <div className="profile-details">
+                                    {error && (
+                                        <div className="profile-error" style={{ 
+                                            color: '#c62828', 
+                                            backgroundColor: '#ffebee', 
+                                            padding: '10px', 
+                                            borderRadius: '8px', 
+                                            marginBottom: '15px',
+                                            fontSize: '14px'
+                                        }}>
+                                            {error}
+                                        </div>
+                                    )}
+                                    {success && (
+                                        <div className="profile-success" style={{ 
+                                            color: '#2e7d32', 
+                                            backgroundColor: '#e8f5e9', 
+                                            padding: '10px', 
+                                            borderRadius: '8px', 
+                                            marginBottom: '15px',
+                                            fontSize: '14px'
+                                        }}>
+                                            {success}
+                                        </div>
+                                    )}
+                                    <div className="profile-detail-item">
+                                        <strong>Name:</strong>
+                                        <input 
+                                            type="text"
+                                            value={profileData.name} 
+                                            onChange={(e) => handleInputChange('name', e.target.value)}
+                                            className="profile-input"
+                                            disabled={saving}
+                                        />
+                                    </div>
+                                    <div className="profile-detail-item">
+                                        <strong>E-Mail:</strong>
+                                        <input 
+                                            type="email"
+                                            value={profileData.email} 
+                                            onChange={(e) => handleInputChange('email', e.target.value)}
+                                            className="profile-input"
+                                            disabled={saving}
+                                        />
+                                    </div>
+                                    <div className="profile-detail-item">
+                                        <strong>Abteilung:</strong>
+                                        <input 
+                                            type="text"
+                                            value={profileData.abteilung} 
+                                            onChange={(e) => handleInputChange('abteilung', e.target.value)}
+                                            className="profile-input"
+                                            disabled={saving}
+                                        />
+                                    </div>
+                                    <div className="profile-detail-item">
+                                        <strong>Status:</strong>
+                                        <span className="status-online">Online</span>
+                                    </div>
+                                    <button 
+                                        onClick={handleSave} 
+                                        disabled={saving}
+                                        style={{
+                                            marginTop: '20px',
+                                            padding: '10px 20px',
+                                            backgroundColor: '#1976d2',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            cursor: saving ? 'not-allowed' : 'pointer',
+                                            width: '100%',
+                                            fontSize: '16px',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        {saving ? 'Wird gespeichert...' : 'Speichern'}
+                                    </button>
+
+                                    <button 
+                                        onClick={logout}
+                                        style={{
+                                            marginTop: '10px',
+                                            padding: '10px 20px',
+                                            backgroundColor: '#dc3545',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '8px',
+                                            cursor: 'pointer',
+                                            width: '100%',
+                                            fontSize: '16px',
+                                            fontWeight: '600'
+                                        }}
+                                    >
+                                        Abmelden
+                                    </button>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

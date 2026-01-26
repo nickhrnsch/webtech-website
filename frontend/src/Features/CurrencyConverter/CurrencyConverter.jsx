@@ -20,10 +20,10 @@ import StarBorderIcon from '@mui/icons-material/StarBorder';
 import CurrencySelector from './CurrencySelector';
 import ExchangeRateInfo from './ExchangeRateInfo';
 import { convertCurrency } from './CurrencyConverterService';
+import { getCurrencyFavorites, updateCurrencyFavorites } from '../../services/userService';
 import {
   DEFAULT_FROM_CURRENCY,
   DEFAULT_TO_CURRENCY,
-  FAVORITES_STORAGE_KEY,
   CURRENCY_INFO,
 } from './constants';
 import {
@@ -58,25 +58,30 @@ function CurrencyConverter() {
 
   // ========== FAVORITEN LADEN ==========
   useEffect(() => {
-    // Lade Favoriten aus localStorage beim Start
-    const storedFavorites = localStorage.getItem(FAVORITES_STORAGE_KEY);
-    if (storedFavorites) {
+    async function loadFavorites() {
       try {
-        setFavorites(JSON.parse(storedFavorites));
+        const favoritesFromApi = await getCurrencyFavorites();
+        setFavorites(favoritesFromApi || []);
       } catch (e) {
         console.error('Fehler beim Laden der Favoriten:', e);
       }
     }
+    loadFavorites();
   }, []);
 
   // ========== FAVORITEN SPEICHERN ==========
-  const saveFavorites = (newFavorites) => {
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(newFavorites));
-    setFavorites(newFavorites);
+  const saveFavorites = async (newFavorites) => {
+    try {
+      const saved = await updateCurrencyFavorites(newFavorites);
+      setFavorites(saved || newFavorites);
+    } catch (e) {
+      console.error('Fehler beim Speichern der Favoriten:', e);
+      setFavorites(newFavorites);
+    }
   };
 
   // ========== FAVORIT HINZUFÜGEN/ENTFERNEN ==========
-  const toggleFavorite = () => {
+  const toggleFavorite = async () => {
     const favoriteKey = `${fromCurrency}-${toCurrency}`;
     const existingIndex = favorites.findIndex(
       (fav) => fav.from === fromCurrency && fav.to === toCurrency
@@ -85,7 +90,7 @@ function CurrencyConverter() {
     if (existingIndex !== -1) {
       // Entfernen
       const newFavorites = favorites.filter((_, index) => index !== existingIndex);
-      saveFavorites(newFavorites);
+      await saveFavorites(newFavorites);
     } else {
       // Hinzufügen
       const newFavorite = {
@@ -93,7 +98,7 @@ function CurrencyConverter() {
         to: toCurrency,
         label: `${fromCurrency} → ${toCurrency}`,
       };
-      saveFavorites([...favorites, newFavorite]);
+      await saveFavorites([...favorites, newFavorite]);
     }
   };
 

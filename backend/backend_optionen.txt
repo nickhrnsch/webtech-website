@@ -3,5 +3,3 @@ FastAPI
 Flask
 
 Beide sind mit Python.
-
-<<leckeier
