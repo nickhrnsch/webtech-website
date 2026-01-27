@@ -11,6 +11,11 @@ function SidebarProfile() {
         email: '',
         abteilung: ''
     });
+    const [originalProfileData, setOriginalProfileData] = useState({
+        name: '',
+        email: '',
+        abteilung: ''
+    });
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
@@ -19,11 +24,13 @@ function SidebarProfile() {
     // Lade Profildaten beim Öffnen des Popups oder wenn User sich ändert
     useEffect(() => {
         if (user) {
-            setProfileData({
+            const initialData = {
                 name: user.name || '',
                 email: user.email || '',
                 abteilung: user.abteilung || ''
-            });
+            };
+            setProfileData(initialData);
+            setOriginalProfileData(initialData);
         }
     }, [user]);
 
@@ -39,17 +46,25 @@ function SidebarProfile() {
         setError('');
         try {
             const profile = await getProfile();
-            setProfileData({
+            const loadedData = {
                 name: profile.name || '',
                 email: profile.email || '',
                 abteilung: profile.abteilung || ''
-            });
+            };
+            setProfileData(loadedData);
+            setOriginalProfileData(loadedData);
         } catch (err) {
             setError('Fehler beim Laden des Profils');
             console.error('Profile Load Error:', err);
         } finally {
             setLoading(false);
         }
+    };
+
+    const hasChanges = () => {
+        return profileData.name !== originalProfileData.name ||
+               profileData.email !== originalProfileData.email ||
+               profileData.abteilung !== originalProfileData.abteilung;
     };
 
     const handleClick = () => {
@@ -123,7 +138,7 @@ function SidebarProfile() {
                             <>
                                 <div className="profile-avatar-large">
                                     <img 
-                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1976d2&color=fff&size=100`}
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1976d2&color=fff&size=80`}
                                         alt="User Avatar" 
                                     />
                                 </div>
@@ -186,42 +201,44 @@ function SidebarProfile() {
                                         <strong>Status:</strong>
                                         <span className="status-online">Online</span>
                                     </div>
-                                    <button 
-                                        onClick={handleSave} 
-                                        disabled={saving}
-                                        style={{
-                                            marginTop: '20px',
-                                            padding: '10px 20px',
-                                            backgroundColor: '#1976d2',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '8px',
-                                            cursor: saving ? 'not-allowed' : 'pointer',
-                                            width: '100%',
-                                            fontSize: '16px',
-                                            fontWeight: '600'
-                                        }}
-                                    >
-                                        {saving ? 'Wird gespeichert...' : 'Speichern'}
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                        <button 
+                                            onClick={handleSave} 
+                                            disabled={saving || !hasChanges()}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px 20px',
+                                                backgroundColor: (saving || !hasChanges()) ? '#cccccc' : '#1976d2',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                cursor: (saving || !hasChanges()) ? 'not-allowed' : 'pointer',
+                                                fontSize: '16px',
+                                                fontWeight: '600',
+                                                opacity: (saving || !hasChanges()) ? 0.6 : 1,
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
+                                            {saving ? 'Speichert...' : 'Speichern'}
+                                        </button>
 
-                                    <button 
-                                        onClick={logout}
-                                        style={{
-                                            marginTop: '10px',
-                                            padding: '10px 20px',
-                                            backgroundColor: '#dc3545',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            width: '100%',
-                                            fontSize: '16px',
-                                            fontWeight: '600'
-                                        }}
-                                    >
-                                        Abmelden
-                                    </button>
+                                        <button 
+                                            onClick={logout}
+                                            style={{
+                                                flex: 1,
+                                                padding: '10px 20px',
+                                                backgroundColor: '#dc3545',
+                                                color: 'white',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                cursor: 'pointer',
+                                                fontSize: '16px',
+                                                fontWeight: '600'
+                                            }}
+                                        >
+                                            Abmelden
+                                        </button>
+                                    </div>
                                 </div>
                             </>
                         )}

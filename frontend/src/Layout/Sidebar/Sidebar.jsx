@@ -1,10 +1,18 @@
 import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./SidebarStyle.css";
 import { SidebarData } from "./SidebarData";
 import SidebarProfile from "./SidebarProfile";
 import CalenderIcon from "./SidebarIcons/CalenderIcon.png";
 
 function Sidebar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
@@ -13,10 +21,12 @@ function Sidebar() {
       </div>
       <ul>
         {SidebarData.map((item, index) => {
+          const isActive = location.pathname === item.path;
           return (
             <button 
               key={index} 
-              className="sidebar-button"
+              className={`sidebar-button ${isActive ? 'active' : ''}`}
+              onClick={() => handleNavigation(item.path)}
             >
               {item.type === "image" ? (
                 <img src={item.icon} alt={item.title} className="sidebar-icon" />
