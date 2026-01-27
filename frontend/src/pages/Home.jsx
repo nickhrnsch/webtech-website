@@ -16,6 +16,7 @@ function Home() {
 
   return (
     <Fenster title="Dashboard">
+      
       <Widget className="calendar-widget">
         <div className="calendar-events-container">
           <MUICalender 
