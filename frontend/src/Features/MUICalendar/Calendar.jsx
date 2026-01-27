@@ -2,176 +2,340 @@ import * as React from "react";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import "dayjs/locale/de";
+import Badge from "@mui/material/Badge";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import IconButton from "@mui/material/IconButton";
+import CircularProgress from "@mui/material/CircularProgress";
+import Alert from "@mui/material/Alert";
+import Chip from "@mui/material/Chip";
+import WbSunnyIcon from "@mui/icons-material/WbSunny";
+import ShareIcon from "@mui/icons-material/Share";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Snackbar from "@mui/material/Snackbar";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import FormatBoldIcon from "@mui/icons-material/FormatBold";
+import FormatItalicIcon from "@mui/icons-material/FormatItalic";
+import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
+import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { PickersDay } from "@mui/x-date-pickers/PickersDay";
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
-
-// Importiere ausgelagerte Komponenten
-import ServerDay from "./ServerDay";
-import NoteDialog from "./NoteDialog";
-import VacationDialog from "./VacationDialog";
-import ConfirmDialog from "./ConfirmDialog";
-import ExportMenu from "./ExportMenu";
-
-// Importiere Service-Funktionen
-import { fetchWeather } from "./weatherService";
-import {
-  createShareUrl,
-  copyToClipboard,
-  exportToGoogleCalendar,
-  downloadICS,
-  parseSharedVacationFromUrl,
-} from "./exportService";
-import {
-  createVacation,
-  updateVacation,
-  addVacation,
-  updateVacationInList,
-  findVacationByDay,
-} from "./vacationHandlers";
-
-// Importiere Styles
-import { calendarStyles, snackbarConfig } from "./styles";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 const initialValue = dayjs();
 
-/**
- * Hauptkomponente für den Kalender mit Notizen und Urlaubsplanung
- * 
- * Features:
- * - Anzeige eines interaktiven Kalenders
- * - Notizen für einzelne Tage
- * - Urlaubsplanung mit Datum, Ort und Personen
- * - Wetter-API Integration
- * - Export zu Google Calendar und .ics Dateien
- * - Teilen von Urlauben via URL
- */
-export default function DateCalendarServerRequest() {
-  // ========== Dialog States ==========
-  // State für Notizen-Dialog
+// Deutsche Feiertage (vereinfachte Liste, kann erweitert werden)
+const holidays = [
+  "2025-01-01", // Neujahr
+  "2025-04-18", // Karfreitag
+  "2025-04-21", // Ostermontag
+  "2025-05-01", // Tag der Arbeit
+  "2025-05-29", // Christi Himmelfahrt
+  "2025-06-09", // Pfingstmontag
+  "2025-10-03", // Tag der Deutschen Einheit
+  "2025-12-25", // 1. Weihnachtstag
+  "2025-12-26", // 2. Weihnachtstag
+  "2026-01-01", // Neujahr
+  "2026-04-03", // Karfreitag
+  "2026-04-06", // Ostermontag
+  "2026-05-01", // Tag der Arbeit
+  "2026-05-14", // Christi Himmelfahrt
+  "2026-05-25", // Pfingstmontag
+  "2026-10-03", // Tag der Deutschen Einheit
+  "2026-12-25", // 1. Weihnachtstag
+  "2026-12-26", // 2. Weihnachtstag
+];
+
+function isWeekend(day) {
+  const dayOfWeek = day.day();
+  return dayOfWeek === 0 || dayOfWeek === 6; // 0 = Sonntag, 6 = Samstag
+}
+
+function isHoliday(dayKey) {
+  return holidays.includes(dayKey);
+}
+
+function getDayBackgroundColor(day, dayKey, isVacation) {
+  if (isVacation) {
+    // Urlaubstage mit Saisonfarben
+    const month = day.month() + 1;
+    if (month >= 3 && month <= 5) return "rgba(255, 192, 203, 0.4)"; // Frühling
+    if (month >= 6 && month <= 8) return "rgba(144, 238, 144, 0.4)"; // Sommer
+    if (month >= 9 && month <= 11) return "rgba(255, 140, 0, 0.4)"; // Herbst
+    return "rgba(173, 216, 230, 0.4)"; // Winter
+  }
+
+  if (isHoliday(dayKey)) {
+    return "rgba(255, 215, 0, 0.2)"; // Gold/Gelb für Feiertage
+  }
+
+  if (isWeekend(day)) {
+    return "rgba(173, 216, 230, 0.15)"; // Hellblau für Wochenende
+  }
+
+  return "rgba(240, 240, 240, 0.15)"; // Sehr blasses Grau für Arbeitstage
+}
+
+function getSeasonEmoji(month) {
+  // Frühling: März(3), April(4), Mai(5)
+  if (month >= 3 && month <= 5) return "🌸";
+  // Sommer: Juni(6), Juli(7), August(8)
+  if (month >= 6 && month <= 8) return "🌴";
+  // Herbst: September(9), Oktober(10), November(11)
+  if (month >= 9 && month <= 11) return "🍂";
+  // Winter: Dezember(12), Januar(1), Februar(2)
+  return "❄️";
+}
+
+function ServerDay(props) {
+  const {
+    day,
+    outsideCurrentMonth,
+    onDayDoubleClick,
+    onDayClick,
+    selectedDate,
+    notes = {},
+    vacationDays = [],
+    ...other
+  } = props;
+
+  const dayKey = day.format("YYYY-MM-DD");
+  const hasNote =
+    !outsideCurrentMonth && notes[dayKey] && notes[dayKey].trim() !== "";
+  const vacation = !outsideCurrentMonth && vacationDays.find(v => v.days.includes(dayKey));
+  const isVacation = !!vacation;
+  const isClicked = selectedDate && day.isSame(selectedDate, 'day');
+
+  const month = day.month() + 1; // dayjs months are 0-indexed
+  const vacationEmoji = getSeasonEmoji(month);
+  const bgColor = getDayBackgroundColor(day, dayKey, isVacation);
+
+  const handleDoubleClick = () => {
+    if (!outsideCurrentMonth) {
+      onDayDoubleClick(day);
+    }
+  };
+
+  const handleClick = () => {
+    if (!outsideCurrentMonth && onDayClick) {
+      onDayClick(day);
+    }
+  };
+
+  return (
+    <Badge
+      key={props.day.toString()}
+      overlap="circular"
+      badgeContent={isVacation ? vacationEmoji : hasNote ? "📝" : undefined}
+    >
+      <PickersDay
+        {...other}
+        outsideCurrentMonth={outsideCurrentMonth}
+        day={day}
+        onDoubleClick={handleDoubleClick}
+        onClick={handleClick}
+        sx={{
+          backgroundColor: isClicked ? "rgba(25, 118, 210, 0.3)" : bgColor,
+          border: isClicked ? "2px solid #1976d2" : "none",
+          "&:hover": {
+            backgroundColor: isClicked ? "rgba(25, 118, 210, 0.4)" : bgColor,
+            filter: isClicked ? "none" : "brightness(0.95)",
+          },
+        }}
+      />
+    </Badge>
+  );
+}
+
+export default function DateCalendarServerRequest({ onVacationsChange, selectedDate, onDateChange }) {
   const [openDialog, setOpenDialog] = React.useState(false);
   const [selectedDay, setSelectedDay] = React.useState(null);
-  
-  // State für Notizen
-  const [notes, setNotes] = React.useState({}); // Speichert Notizen nach Datum
+  const [notes, setNotes] = React.useState({});
   const [currentNote, setCurrentNote] = React.useState("");
   const [formatting, setFormatting] = React.useState({
     bold: false,
     italic: false,
     underline: false,
   });
-  
-  // ========== Urlaubs-States ==========
-  // State für Urlaubs-Dialog
   const [openVacationDialog, setOpenVacationDialog] = React.useState(false);
   const [vacationStart, setVacationStart] = React.useState(null);
   const [vacationEnd, setVacationEnd] = React.useState(null);
   const [vacationLocation, setVacationLocation] = React.useState("");
   const [vacationPeople, setVacationPeople] = React.useState("");
-  const [vacations, setVacations] = React.useState([]); // Array aller gespeicherten Urlaube
-  
-  // ========== Wetter-States ==========
+  const [vacations, setVacations] = React.useState([]);
   const [weatherData, setWeatherData] = React.useState(null);
   const [loadingWeather, setLoadingWeather] = React.useState(false);
   const [weatherError, setWeatherError] = React.useState(null);
-  
-  // ========== Edit & Share States ==========
   const [isEditingVacation, setIsEditingVacation] = React.useState(false);
   const [editingVacationId, setEditingVacationId] = React.useState(null);
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [sharedVacationData, setSharedVacationData] = React.useState(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
-  
-  // ========== Export-States ==========
   const [calendarMenuAnchor, setCalendarMenuAnchor] = React.useState(null);
   const [selectedVacationForExport, setSelectedVacationForExport] = React.useState(null);
 
-  // ========== EFFECTS ==========
-  /**
-   * Prüft beim ersten Laden der Komponente, ob ein geteilter Urlaub
-   * in der URL vorhanden ist (z.B. ?vacation=...)
-   * Falls ja, wird ein Bestätigungs-Dialog angezeigt
-   */
+  // Benachrichtige Parent-Komponente über Änderungen der Urlaube
   useEffect(() => {
-    const sharedData = parseSharedVacationFromUrl();
-    if (sharedData) {
-      setSharedVacationData(sharedData);
-      setConfirmDialogOpen(true);
+    if (onVacationsChange) {
+      onVacationsChange(vacations);
+    }
+  }, [vacations, onVacationsChange]);
+
+  // WMO Weather Code zu Beschreibung (vereinfacht)
+  // Prüfe beim Laden auf geteilte Urlaube in der URL
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedVacation = urlParams.get('vacation');
+    
+    if (sharedVacation) {
+      try {
+        const decoded = JSON.parse(decodeURIComponent(sharedVacation));
+        setSharedVacationData(decoded);
+        setConfirmDialogOpen(true);
+        // Entferne Parameter aus URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (error) {
+        console.error("Fehler beim Laden des geteilten Urlaubs:", error);
+      }
     }
   }, []);
 
-  // ========== SHARE & EXPORT HANDLERS ==========
-  /**
-   * Erstellt einen teilbaren Link für einen Urlaub und kopiert ihn in die Zwischenablage
-   * @param {Object} vacation - Das Urlaubs-Objekt mit allen Daten
-   */
   const handleShareVacation = (vacation) => {
-    const shareUrl = createShareUrl(vacation);
+    const shareData = {
+      startDate: vacation.startDate,
+      endDate: vacation.endDate,
+      location: vacation.location,
+      people: vacation.people,
+      weatherData: vacation.weatherData,
+    };
     
-    copyToClipboard(shareUrl)
-      .then(() => {
-        setSnackbarMessage("Link wurde in die Zwischenablage kopiert!");
-        setSnackbarOpen(true);
-      })
-      .catch((err) => {
-        console.error("Fehler beim Kopieren:", err);
-        setSnackbarMessage("Fehler beim Kopieren des Links");
-        setSnackbarOpen(true);
-      });
+    const encoded = encodeURIComponent(JSON.stringify(shareData));
+    const shareUrl = `${window.location.origin}${window.location.pathname}?vacation=${encoded}`;
+    
+    // Kopiere Link in Zwischenablage
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      setSnackbarMessage("Link wurde in die Zwischenablage kopiert!");
+      setSnackbarOpen(true);
+    }).catch((err) => {
+      console.error("Fehler beim Kopieren:", err);
+      setSnackbarMessage("Fehler beim Kopieren des Links");
+      setSnackbarOpen(true);
+    });
   };
 
-  /**
-   * Öffnet Google Calendar mit vorausgefüllten Urlaubsdaten
-   * @param {Object} vacation - Das Urlaubs-Objekt
-   */
   const handleExportToGoogleCalendar = (vacation) => {
-    exportToGoogleCalendar(vacation);
+    const startDate = dayjs(vacation.startDate).format('YYYYMMDD');
+    const endDate = dayjs(vacation.endDate).add(1, 'day').format('YYYYMMDD'); // Google Calendar benötigt exklusives Enddatum
+    
+    const title = vacation.location ? `Urlaub in ${vacation.location}` : 'Urlaub';
+    let description = '';
+    
+    if (vacation.people) {
+      description += `Personen: ${vacation.people}\n`;
+    }
+    if (vacation.weatherData) {
+      description += `Wetter: ${vacation.weatherData.temp}°C, ${vacation.weatherData.description}\n`;
+      description += `Ort: ${vacation.weatherData.locationName}`;
+    }
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(description)}&sf=true&output=xml`;
+    
+    window.open(googleCalendarUrl, '_blank');
     setSnackbarMessage("Google Calendar geöffnet!");
     setSnackbarOpen(true);
   };
 
-  /**
-   * Lädt eine .ics Datei herunter (kompatibel mit allen Kalender-Apps)
-   * @param {Object} vacation - Das Urlaubs-Objekt
-   */
   const handleDownloadICS = (vacation) => {
-    downloadICS(vacation);
+    const startDate = dayjs(vacation.startDate).format('YYYYMMDD');
+    const endDate = dayjs(vacation.endDate).add(1, 'day').format('YYYYMMDD');
+    const now = dayjs().format('YYYYMMDDTHHmmss');
+    
+    const title = vacation.location ? `Urlaub in ${vacation.location}` : 'Urlaub';
+    let description = '';
+    
+    if (vacation.people) {
+      description += `Personen: ${vacation.people}\\n`;
+    }
+    if (vacation.weatherData) {
+      description += `Wetter: ${vacation.weatherData.temp}°C, ${vacation.weatherData.description}\\n`;
+      description += `Ort: ${vacation.weatherData.locationName}`;
+    }
+    
+    const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Vacation Calendar//DE
+BEGIN:VEVENT
+UID:${vacation.id}@vacationcalendar
+DTSTAMP:${now}Z
+DTSTART;VALUE=DATE:${startDate}
+DTEND;VALUE=DATE:${endDate}
+SUMMARY:${title}
+DESCRIPTION:${description}
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+    
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = `urlaub_${vacation.startDate}.ics`;
+    link.click();
+    
     setSnackbarMessage(".ics Datei heruntergeladen!");
     setSnackbarOpen(true);
   };
 
-  /**
-   * Öffnet das Export-Menü (Google Calendar oder .ics)
-   */
   const handleOpenCalendarMenu = (event, vacation) => {
     setCalendarMenuAnchor(event.currentTarget);
     setSelectedVacationForExport(vacation);
   };
 
-  /**
-   * Schließt das Export-Menü
-   */
   const handleCloseCalendarMenu = () => {
     setCalendarMenuAnchor(null);
     setSelectedVacationForExport(null);
   };
 
-  /**
-   * Fügt einen geteilten Urlaub (aus URL) zum eigenen Kalender hinzu
-   */
   const handleAddSharedVacation = () => {
     if (sharedVacationData) {
-      const newVacation = createVacation(
-        dayjs(sharedVacationData.startDate),
-        dayjs(sharedVacationData.endDate),
-        sharedVacationData.location,
-        sharedVacationData.people,
-        sharedVacationData.weatherData
-      );
+      const startDate = dayjs(sharedVacationData.startDate);
+      const endDate = dayjs(sharedVacationData.endDate);
+      
+      const days = [];
+      let currentDay = startDate.clone();
 
-      setVacations((prev) => addVacation(prev, newVacation));
+      while (
+        currentDay.isBefore(endDate) ||
+        currentDay.isSame(endDate, "day")
+      ) {
+        days.push(currentDay.format("YYYY-MM-DD"));
+        currentDay = currentDay.add(1, "day");
+      }
+
+      const vacation = {
+        id: Date.now(),
+        startDate: sharedVacationData.startDate,
+        endDate: sharedVacationData.endDate,
+        location: sharedVacationData.location,
+        people: sharedVacationData.people,
+        weatherData: sharedVacationData.weatherData,
+        days: days,
+      };
+
+      setVacations((prev) => [...prev, vacation]);
       setSnackbarMessage("Geteilter Urlaub wurde hinzugefügt!");
       setSnackbarOpen(true);
     }
@@ -179,13 +343,38 @@ export default function DateCalendarServerRequest() {
     setSharedVacationData(null);
   };
 
-  // ========== WETTER HANDLER ==========
-  /**
-   * Ruft Wetterdaten für den eingegebenen Urlaubsort ab
-   * Nutzt die Open-Meteo API über weatherService.js
-   */
-  const handleFetchWeather = async () => {
-    if (!vacationLocation || vacationLocation.trim() === "") {
+  const getWeatherDescription = (code) => {
+    const weatherCodes = {
+      0: "Klar ☀️",
+      1: "Überwiegend klar 🌤️",
+      2: "Teilweise bewölkt ⛅",
+      3: "Bewölkt ☁️",
+      45: "Neblig 🌫️",
+      48: "Neblig 🌫️",
+      51: "Leichter Nieselregen 🌦️",
+      53: "Nieselregen 🌦️",
+      55: "Starker Nieselregen 🌧️",
+      61: "Leichter Regen 🌧️",
+      63: "Regen 🌧️",
+      65: "Starker Regen 🌧️",
+      71: "Leichter Schneefall ❄️",
+      73: "Schneefall ❄️",
+      75: "Starker Schneefall ❄️",
+      77: "Schneegriesel ❄️",
+      80: "Leichte Regenschauer 🌦️",
+      81: "Regenschauer 🌧️",
+      82: "Starke Regenschauer 🌧️",
+      85: "Leichte Schneeschauer 🌨️",
+      86: "Schneeschauer 🌨️",
+      95: "Gewitter ⛈️",
+      96: "Gewitter mit Hagel ⛈️",
+      99: "Gewitter mit Hagel ⛈️"
+    };
+    return weatherCodes[code] || "Unbekannt";
+  };
+
+  const fetchWeather = async (location) => {
+    if (!location || location.trim() === "") {
       setWeatherData(null);
       setWeatherError(null);
       return;
@@ -195,10 +384,45 @@ export default function DateCalendarServerRequest() {
     setWeatherError(null);
 
     try {
-      const data = await fetchWeather(vacationLocation);
-      setWeatherData(data);
-      console.log("Wetterdaten erfolgreich geladen");
+      // 1. Geocoding: Ort zu Koordinaten
+      console.log("Suche Koordinaten für:", location);
+      const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(location)}&count=1&language=de&format=json`;
+      const geoResponse = await fetch(geoUrl);
+      const geoData = await geoResponse.json();
+      
+      console.log("Geocoding-Antwort:", geoData);
+
+      if (!geoData.results || geoData.results.length === 0) {
+        throw new Error(`Ort "${location}" nicht gefunden`);
+      }
+
+      const { latitude, longitude, name, country } = geoData.results[0];
+      console.log(`Gefunden: ${name}, ${country} (${latitude}, ${longitude})`);
+
+      // 2. Wetterdaten abrufen
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=auto`;
+      const weatherResponse = await fetch(weatherUrl);
+      const weatherData = await weatherResponse.json();
+      
+      console.log("Wetter-Antwort:", weatherData);
+
+      if (!weatherResponse.ok) {
+        throw new Error("Fehler beim Abrufen der Wetterdaten");
+      }
+
+      const current = weatherData.current;
+      setWeatherData({
+        temp: Math.round(current.temperature_2m),
+        feelsLike: Math.round(current.apparent_temperature),
+        description: getWeatherDescription(current.weather_code),
+        weatherCode: current.weather_code,
+        humidity: current.relative_humidity_2m,
+        windSpeed: Math.round(current.wind_speed_10m),
+        locationName: `${name}, ${country}`,
+      });
+      console.log("Wetterdaten erfolgreich geladen für:", name);
     } catch (error) {
+      console.error("Wetter-API Fehler:", error);
       setWeatherError(error.message);
       setWeatherData(null);
     } finally {
@@ -206,17 +430,12 @@ export default function DateCalendarServerRequest() {
     }
   };
 
-  // ========== NOTIZEN HANDLERS ==========
-  /**
-   * Wird beim Doppelklick auf einen Tag im Kalender aufgerufen
-   * Öffnet den Notizen-Dialog mit vorhandenen Daten
-   */
   const handleDayDoubleClick = (day) => {
     const dayKey = day.format("YYYY-MM-DD");
     setSelectedDay(day);
     setCurrentNote(notes[dayKey] || "");
     
-    // Prüfe ob dieser Tag zu einem Urlaub gehört und zeige Wetterdaten an
+    // Prüfe ob dieser Tag zu einem Urlaub gehört
     const vacationInfo = vacations.find(v => v.days.includes(dayKey));
     if (vacationInfo && vacationInfo.weatherData) {
       setWeatherData(vacationInfo.weatherData);
@@ -225,18 +444,12 @@ export default function DateCalendarServerRequest() {
     setOpenDialog(true);
   };
 
-  /**
-   * Schließt den Notizen-Dialog und setzt alle temporären States zurück
-   */
   const handleCloseDialog = () => {
-    setOpenDialog(false);findVacationByDay(vacations, dayKey)
+    setOpenDialog(false);
     setSelectedDay(null);
     setWeatherData(null);
   };
 
-  /**
-   * Speichert die Notiz für den ausgewählten Tag
-   */
   const handleSaveNote = () => {
     if (selectedDay) {
       const dayKey = selectedDay.format("YYYY-MM-DD");
@@ -248,14 +461,9 @@ export default function DateCalendarServerRequest() {
     handleCloseDialog();
   };
 
-  // ========== URLAUB HANDLERS ==========
-  /**
-   * Öffnet den Urlaubs-Dialog
-   * @param {Object|null} vacationToEdit - Falls vorhanden: Bearbeitungsmodus, sonst: Neuer Urlaub
-   */
   const handleOpenVacationDialog = (vacationToEdit = null) => {
     if (vacationToEdit) {
-      // Bearbeitungsmodus: Lade vorhandene Urlaubsdaten
+      // Bearbeitungsmodus
       setIsEditingVacation(true);
       setEditingVacationId(vacationToEdit.id);
       setVacationStart(dayjs(vacationToEdit.startDate));
@@ -264,16 +472,13 @@ export default function DateCalendarServerRequest() {
       setVacationPeople(vacationToEdit.people || "");
       setWeatherData(vacationToEdit.weatherData || null);
     } else {
-      // Neuer Urlaub: Starte mit leeren Feldern
+      // Neuer Urlaub
       setIsEditingVacation(false);
       setEditingVacationId(null);
     }
     setOpenVacationDialog(true);
   };
 
-  /**
-   * Schließt den Urlaubs-Dialog und setzt alle Felder zurück
-   */
   const handleCloseVacationDialog = () => {
     setOpenVacationDialog(false);
     setVacationStart(null);
@@ -286,124 +491,466 @@ export default function DateCalendarServerRequest() {
     setEditingVacationId(null);
   };
 
-  /**
-   * Speichert einen neuen Urlaub oder aktualisiert einen bestehenden
-   * Nutzt die ausgelagerten Funktionen aus vacationHandlers.js
-   */
   const handleSaveVacation = () => {
     if (vacationStart && vacationEnd) {
+      const days = [];
+      let currentDay = vacationStart.clone();
+
+      while (
+        currentDay.isBefore(vacationEnd) ||
+        currentDay.isSame(vacationEnd, "day")
+      ) {
+        days.push(currentDay.format("YYYY-MM-DD"));
+        currentDay = currentDay.add(1, "day");
+      }
+
       if (isEditingVacation && editingVacationId) {
-        // Update-Modus: Aktualisiere bestehenden Urlaub
-        const existingVacation = vacations.find(v => v.id === editingVacationId);
-        const updatedVacation = updateVacation(
-          existingVacation,
-          vacationStart,
-          vacationEnd,
-          vacationLocation,
-          vacationPeople,
-          weatherData
+        // Update bestehenden Urlaub
+        setVacations((prev) => 
+          prev.map((v) => 
+            v.id === editingVacationId
+              ? {
+                  ...v,
+                  startDate: vacationStart.format("YYYY-MM-DD"),
+                  endDate: vacationEnd.format("YYYY-MM-DD"),
+                  location: vacationLocation,
+                  people: vacationPeople,
+                  weatherData: weatherData,
+                  days: days,
+                }
+              : v
+          )
         );
-        setVacations((prev) => updateVacationInList(prev, editingVacationId, updatedVacation));
         console.log("Urlaub aktualisiert:", editingVacationId);
       } else {
-        // Erstell-Modus: Füge neuen Urlaub hinzu
-        const newVacation = createVacation(
-          vacationStart,
-          vacationEnd,
-          vacationLocation,
-          vacationPeople,
-          weatherData
-        );
-        setVacations((prev) => addVacation(prev, newVacation));
-        console.log("Urlaub gespeichert:", newVacation);
+        // Speichere neuen Urlaub
+        const vacation = {
+          id: Date.now(),
+          startDate: vacationStart.format("YYYY-MM-DD"),
+          endDate: vacationEnd.format("YYYY-MM-DD"),
+          location: vacationLocation,
+          people: vacationPeople,
+          weatherData: weatherData,
+          days: days,
+        };
+
+        setVacations((prev) => [...prev, vacation]);
+        console.log("Urlaub gespeichert:", vacation);
       }
     }
     handleCloseVacationDialog();
   };
 
-  // ========== RENDER ==========
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
-      {/* Haupt-Kalender Komponente mit deutscher Lokalisierung */}
       <DateCalendar
-        defaultValue={initialValue}
+        value={selectedDate || initialValue}
         slots={{
-          day: ServerDay, // Custom Day-Komponente mit Notizen & Urlaubs-Badges
+          day: ServerDay,
         }}
         slotProps={{
           day: {
             notes,
             vacationDays: vacations,
             onDayDoubleClick: handleDayDoubleClick,
+            onDayClick: onDateChange,
+            selectedDate: selectedDate,
           },
         }}
-        sx={calendarStyles}
+        sx={{
+          color: "black",
+          maxWidth: "370px",
+          maxHeight: "320px",
+          margin: "0 auto",
+          "& .MuiPickersDay-root": {
+            color: "black",
+          },
+          "& .MuiDayCalendar-weekDayLabel": {
+            color: "black",
+          },
+          "& .MuiPickersCalendarHeader-label": {
+            color: "black",
+          },
+        }}
       />
 
-      {/* ========== NOTIZEN DIALOG ========== */}
-      <NoteDialog
+      <Dialog
         open={openDialog}
         onClose={handleCloseDialog}
-        onSave={handleSaveNote}
-        selectedDay={selectedDay}
-        currentNote={currentNote}
-        setCurrentNote={setCurrentNote}
-        formatting={formatting}
-        setFormatting={setFormatting}
-        vacationInfo={selectedDay ? findVacationByDay(vacations, selectedDay.format("YYYY-MM-DD")) : null}
-        onOpenVacationDialog={handleOpenVacationDialog}
-        onOpenCalendarMenu={handleOpenCalendarMenu}
-        onShareVacation={handleShareVacation}
-      />
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Notiz für {selectedDay?.format("DD.MM.YYYY")}</DialogTitle>
+        <DialogContent>
+          {(() => {
+            const dayKey = selectedDay?.format("YYYY-MM-DD");
+            const vacationInfo = vacations.find(v => v.days.includes(dayKey));
+            
+            if (vacationInfo) {
+              return (
+                <Paper
+                  elevation={3}
+                  sx={{
+                    mt: 2,
+                    mb: 3,
+                    p: 2,
+                    bgcolor: "primary.light",
+                    color: "white",
+                  }}
+                >
+                  <Box sx={{ mb: 2 }}>
+                    <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 1 }}>
+                      <Box sx={{ fontWeight: "bold", fontSize: "1.1rem" }}>
+                        🏖️ Urlaub geplant
+                      </Box>
+                      <Box>
+                        <IconButton
+                          size="small"
+                          onClick={(e) => handleOpenCalendarMenu(e, vacationInfo)}
+                          sx={{ color: "white" }}
+                          title="Zu Kalender hinzufügen"
+                        >
+                          <CalendarMonthIcon />
+                        </IconButton>
+                        <IconButton
+                          size="small"
+                          onClick={() => handleShareVacation(vacationInfo)}
+                          sx={{ color: "white" }}
+                          title="Urlaub teilen"
+                        >
+                          <ShareIcon />
+                        </IconButton>
+                      </Box>
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                      <Box>
+                        📅 {dayjs(vacationInfo.startDate).format("DD.MM.YYYY")} - {dayjs(vacationInfo.endDate).format("DD.MM.YYYY")}
+                      </Box>
+                      {vacationInfo.location && (
+                        <Box>📍 Ort: {vacationInfo.location}</Box>
+                      )}
+                      {vacationInfo.people && (
+                        <Box>👥 Personen: {vacationInfo.people}</Box>
+                      )}
+                    </Box>
+                  </Box>
+                  {vacationInfo.weatherData && (
+                    <Box sx={{ 
+                      bgcolor: "rgba(255, 255, 255, 0.2)", 
+                      p: 1.5, 
+                      borderRadius: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 0.5
+                    }}>
+                      <Box sx={{ fontWeight: "bold", mb: 0.5 }}>
+                        🌤️ Wetter in {vacationInfo.weatherData.locationName}:
+                      </Box>
+                      <Box>🌡️ {vacationInfo.weatherData.temp}°C (gefühlt {vacationInfo.weatherData.feelsLike}°C)</Box>
+                      <Box>☁️ {vacationInfo.weatherData.description}</Box>
+                      <Box>💧 {vacationInfo.weatherData.humidity}% Luftfeuchtigkeit</Box>
+                      <Box>💨 Wind: {vacationInfo.weatherData.windSpeed} km/h</Box>
+                    </Box>
+                  )}
+                </Paper>
+              );
+            }
+            return null;
+          })()}
+          <Paper
+            elevation={0}
+            sx={{
+              mt: 2,
+              border: "1px solid rgba(0, 0, 0, 0.23)",
+              borderRadius: 1,
+              overflow: "hidden",
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                gap: 0.5,
+                p: 1,
+                borderBottom: "1px solid rgba(0, 0, 0, 0.12)",
+                bgcolor: "grey.50",
+              }}
+            >
+              <IconButton
+                size="small"
+                onClick={() =>
+                  setFormatting((prev) => ({ ...prev, bold: !prev.bold }))
+                }
+                color={formatting.bold ? "primary" : "default"}
+              >
+                <FormatBoldIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  setFormatting((prev) => ({ ...prev, italic: !prev.italic }))
+                }
+                color={formatting.italic ? "primary" : "default"}
+              >
+                <FormatItalicIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() =>
+                  setFormatting((prev) => ({
+                    ...prev,
+                    underline: !prev.underline,
+                  }))
+                }
+                color={formatting.underline ? "primary" : "default"}
+              >
+                <FormatUnderlinedIcon fontSize="small" />
+              </IconButton>
+              <IconButton size="small">
+                <FormatListBulletedIcon fontSize="small" />
+              </IconButton>
+            </Box>
+            <TextField
+              autoFocus
+              multiline
+              rows={8}
+              fullWidth
+              placeholder="Deine Notiz hier eingeben..."
+              value={currentNote}
+              onChange={(e) => setCurrentNote(e.target.value)}
+              variant="standard"
+              InputProps={{
+                disableUnderline: true,
+                sx: {
+                  p: 2,
+                  fontWeight: formatting.bold ? "bold" : "normal",
+                  fontStyle: formatting.italic ? "italic" : "normal",
+                  textDecoration: formatting.underline ? "underline" : "none",
+                },
+              }}
+            />
+          </Paper>
+          <Box
+            sx={{ display: "flex", gap: 1, mt: 3, justifyContent: "center" }}
+          >
+            <Button 
+              variant="outlined" 
+              color="primary" 
+              size="small"
+              disabled={!(() => {
+                const dayKey = selectedDay?.format("YYYY-MM-DD");
+                return vacations.find(v => v.days.includes(dayKey));
+              })()}
+              onClick={() => {
+                const dayKey = selectedDay?.format("YYYY-MM-DD");
+                const vacation = vacations.find(v => v.days.includes(dayKey));
+                if (vacation) {
+                  handleOpenVacationDialog(vacation);
+                }
+              }}
+            >
+              Urlaub bearbeiten
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => handleOpenVacationDialog()}
+            >
+              Urlaub hinzufügen
+            </Button>
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Abbrechen</Button>
+          <Button onClick={handleSaveNote} variant="contained">
+            Speichern
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-      {/* ========== URLAUBS-DIALOG ========== */}
-      <VacationDialog
+      <Dialog
         open={openVacationDialog}
         onClose={handleCloseVacationDialog}
-        onSave={handleSaveVacation}
-        isEditing={isEditingVacation}
-        vacationStart={vacationStart}
-        setVacationStart={setVacationStart}
-        vacationEnd={vacationEnd}
-        setVacationEnd={setVacationEnd}
-        vacationLocation={vacationLocation}
-        setVacationLocation={setVacationLocation}
-        vacationPeople={vacationPeople}
-        setVacationPeople={setVacationPeople}
-        weatherData={weatherData}
-        loadingWeather={loadingWeather}
-        weatherError={weatherError}
-        onFetchWeather={handleFetchWeather}
-      />
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>{isEditingVacation ? "Urlaub bearbeiten" : "Urlaub hinzufügen"}</DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 2 }}>
+            <DatePicker
+              label="Startdatum"
+              value={vacationStart}
+              onChange={(newValue) => setVacationStart(newValue)}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  variant: "outlined",
+                },
+              }}
+            />
+            <DatePicker
+              label="Enddatum"
+              value={vacationEnd}
+              onChange={(newValue) => setVacationEnd(newValue)}
+              minDate={vacationStart}
+              slotProps={{
+                textField: {
+                  fullWidth: true,
+                  variant: "outlined",
+                },
+              }}
+            />
+            <Box>
+              <TextField
+                label="Ort"
+                value={vacationLocation}
+                onChange={(e) => setVacationLocation(e.target.value)}
+                fullWidth
+                variant="outlined"
+                placeholder="z.B. Mallorca, Italien, Berlin"
+              />
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={loadingWeather ? <CircularProgress size={16} /> : <WbSunnyIcon />}
+                onClick={() => fetchWeather(vacationLocation)}
+                disabled={!vacationLocation || loadingWeather}
+                sx={{ mt: 1 }}
+              >
+                Wetter abrufen
+              </Button>
+              {weatherData && (
+                <Box sx={{ mt: 2 }}>
+                  <Alert severity="success" sx={{ mb: 1 }}>
+                    Wetter für {weatherData.locationName}
+                  </Alert>
+                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+                    <Chip
+                      label={`${weatherData.temp}°C`}
+                      color="primary"
+                    />
+                    <Chip label={weatherData.description} />
+                    <Chip label={`Gefühlt: ${weatherData.feelsLike}°C`} variant="outlined" />
+                    <Chip label={`${weatherData.humidity}% Luftfeuchtigkeit`} variant="outlined" />
+                    <Chip label={`Wind: ${weatherData.windSpeed} km/h`} variant="outlined" />
+                  </Box>
+                </Box>
+              )}
+              {weatherError && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  {weatherError}
+                </Alert>
+              )}
+            </Box>
+            <TextField
+              label="Personen"
+              value={vacationPeople}
+              onChange={(e) => setVacationPeople(e.target.value)}
+              fullWidth
+              variant="outlined"
+              placeholder="z.B. Familie, Freunde, Partner"
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseVacationDialog}>Abbrechen</Button>
+          <Button
+            onClick={handleSaveVacation}
+            variant="contained"
+            disabled={!vacationStart || !vacationEnd}
+          >
+            Speichern
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-      {/* ========== EXPORT-MENÜ ========== */}
-      <ExportMenu
+      <Menu
         anchorEl={calendarMenuAnchor}
         open={Boolean(calendarMenuAnchor)}
         onClose={handleCloseCalendarMenu}
-        onExportToGoogle={() => selectedVacationForExport && handleExportToGoogleCalendar(selectedVacationForExport)}
-        onDownloadICS={() => selectedVacationForExport && handleDownloadICS(selectedVacationForExport)}
-      />
+      >
+        <MenuItem onClick={() => {
+          if (selectedVacationForExport) {
+            handleExportToGoogleCalendar(selectedVacationForExport);
+          }
+          handleCloseCalendarMenu();
+        }}>
+          <ListItemIcon>
+            <CalendarMonthIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>Zu Google Calendar</ListItemText>
+        </MenuItem>
+        <MenuItem onClick={() => {
+          if (selectedVacationForExport) {
+            handleDownloadICS(selectedVacationForExport);
+          }
+          handleCloseCalendarMenu();
+        }}>
+          <ListItemIcon>
+            <FileDownloadIcon fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>.ics Datei herunterladen</ListItemText>
+        </MenuItem>
+      </Menu>
 
-      {/* ========== FEEDBACK KOMPONENTEN ========== */}
-      {/* Snackbar für Erfolgs- und Fehlermeldungen */}
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={snackbarConfig.autoHideDuration}
+        autoHideDuration={3000}
         onClose={() => setSnackbarOpen(false)}
         message={snackbarMessage}
       />
 
-      {/* ========== BESTÄTIGUNGS-DIALOG ========== */}
-      <ConfirmDialog
+      <Dialog
         open={confirmDialogOpen}
         onClose={() => {
           setConfirmDialogOpen(false);
           setSharedVacationData(null);
         }}
-        onConfirm={handleAddSharedVacation}
-        sharedVacationData={sharedVacationData}
-      />
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>Geteilten Urlaub hinzufügen?</DialogTitle>
+        <DialogContent>
+          {sharedVacationData && (
+            <Box sx={{ mt: 2 }}>
+              <Box sx={{ mb: 2, p: 2, bgcolor: "grey.100", borderRadius: 1 }}>
+                <Box sx={{ mb: 1 }}>
+                  <strong>Zeitraum:</strong> {dayjs(sharedVacationData.startDate).format("DD.MM.YYYY")} - {dayjs(sharedVacationData.endDate).format("DD.MM.YYYY")}
+                </Box>
+                {sharedVacationData.location && (
+                  <Box sx={{ mb: 1 }}>
+                    <strong>Ort:</strong> {sharedVacationData.location}
+                  </Box>
+                )}
+                {sharedVacationData.people && (
+                  <Box sx={{ mb: 1 }}>
+                    <strong>Personen:</strong> {sharedVacationData.people}
+                  </Box>
+                )}
+                {sharedVacationData.weatherData && (
+                  <Box sx={{ mt: 1, pt: 1, borderTop: "1px solid rgba(0,0,0,0.1)" }}>
+                    <strong>Wetter:</strong> {sharedVacationData.weatherData.temp}°C, {sharedVacationData.weatherData.description}
+                  </Box>
+                )}
+              </Box>
+              <Box sx={{ color: "text.secondary" }}>
+                Möchtest du diesen Urlaub zu deinem Kalender hinzufügen?
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setConfirmDialogOpen(false);
+            setSharedVacationData(null);
+          }}>
+            Abbrechen
+          </Button>
+          <Button onClick={handleAddSharedVacation} variant="contained">
+            Hinzufügen
+          </Button>
+        </DialogActions>
+      </Dialog>
     </LocalizationProvider>
   );
 }
