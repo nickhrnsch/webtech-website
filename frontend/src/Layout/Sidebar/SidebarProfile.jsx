@@ -8,13 +8,11 @@ function SidebarProfile() {
     const [showPopup, setShowPopup] = useState(false);
     const [profileData, setProfileData] = useState({
         name: '',
-        email: '',
-        abteilung: ''
+        email: ''
     });
     const [originalProfileData, setOriginalProfileData] = useState({
         name: '',
-        email: '',
-        abteilung: ''
+        email: ''
     });
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -26,8 +24,7 @@ function SidebarProfile() {
         if (user) {
             const initialData = {
                 name: user.name || '',
-                email: user.email || '',
-                abteilung: user.abteilung || ''
+                email: user.email || ''
             };
             setProfileData(initialData);
             setOriginalProfileData(initialData);
@@ -48,8 +45,7 @@ function SidebarProfile() {
             const profile = await getProfile();
             const loadedData = {
                 name: profile.name || '',
-                email: profile.email || '',
-                abteilung: profile.abteilung || ''
+                email: profile.email || ''
             };
             setProfileData(loadedData);
             setOriginalProfileData(loadedData);
@@ -63,8 +59,7 @@ function SidebarProfile() {
 
     const hasChanges = () => {
         return profileData.name !== originalProfileData.name ||
-               profileData.email !== originalProfileData.email ||
-               profileData.abteilung !== originalProfileData.abteilung;
+               profileData.email !== originalProfileData.email;
     };
 
     const handleClick = () => {
@@ -183,16 +178,6 @@ function SidebarProfile() {
                                             type="email"
                                             value={profileData.email} 
                                             onChange={(e) => handleInputChange('email', e.target.value)}
-                                            className="profile-input"
-                                            disabled={saving}
-                                        />
-                                    </div>
-                                    <div className="profile-detail-item">
-                                        <strong>Abteilung:</strong>
-                                        <input 
-                                            type="text"
-                                            value={profileData.abteilung} 
-                                            onChange={(e) => handleInputChange('abteilung', e.target.value)}
                                             className="profile-input"
                                             disabled={saving}
                                         />
