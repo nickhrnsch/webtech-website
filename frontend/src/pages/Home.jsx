@@ -4,6 +4,7 @@ import Widget from "../Layout/Widgets/Widget";
 import MUICalender from "../Features/MUICalendar/Calendar.jsx";
 import CurrencyConverter from "../Features/CurrencyConverter/CurrencyConverter.jsx";
 import NextEventsList from "../Features/NextEventsList/NextEventsList.jsx";
+import GoogleMaps from "../Features/GoogleMaps/GoogleMaps.jsx";
 
 function Home() {
   const [vacations, setVacations] = useState([]);
@@ -26,11 +27,16 @@ function Home() {
         </div>
       </Widget>
 
+      <Widget className="maps-widget">
+        <GoogleMaps />
+      </Widget>
+
+
       <Widget className="currency-widget">
         <CurrencyConverter />
       </Widget>
 
-      <Widget title="Meine Textwidget 2" text="Hier steht ein Text" />
+      
     </Fenster>
   );
 }

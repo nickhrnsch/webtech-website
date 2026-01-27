@@ -2,20 +2,22 @@
   background: white;
   color: black;
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   margin: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  height: auto;
 }
 
 .widget-card {
   background: white;
   color: black;
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   margin: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  overflow: visible;
   max-width: 100%;
+  height: auto;
 }
 
 .widget-header {
@@ -25,6 +27,7 @@
 
 .widget-body {
   padding-top: 8px;
-  overflow: hidden;
+  overflow: visible;
   max-width: 100%;
+  height: auto;
 }

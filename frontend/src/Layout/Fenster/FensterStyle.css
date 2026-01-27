@@ -18,48 +18,44 @@
   min-height: 0;
 }
 
-/* Widget-Grid: genau 2x2, füllt verbleibende Höhe */
+/* Widget-Bereich: 2 Spalten, Widgets stapeln sich vertikal */
 .fenster-widget-area {
-  display: grid;
-  gap: 16px;
-
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(2, 1fr);
+  column-count: 2;
+  column-gap: 16px;
 
   /* nimmt den restlichen Platz im .fenster-container ein */
   flex: 1 1 auto;
-  min-height: 0;
   width: 100%;
 }
 
-/* Items füllen ihre Zelle, erlauben aber inneres Scrollen */
+/* Items füllen ihre Zelle, passen sich an Inhaltshöhe an */
 .fenster-widget-area > * {
-  min-width: 0;
+  break-inside: avoid;
+  margin-bottom: 16px;
   box-sizing: border-box;
-  overflow: hidden;
-  height: 100%;
-  min-height: 140px; /* verhindert zu kleine Karten */
+  overflow: visible;
+  height: auto;
 }
 
 /* weniger hartes Weiß + etwas dezenter Rahmen */
 .widget-card {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
 
   /* weißer Hintergrund + schwarzer Text */
   background: hsl(0, 0%, 100%);
   color: #2c3e50;
 
   border-radius: 12px;
-  padding: 12px;
+  padding: 20px;
   box-sizing: border-box;
 
   /* dezente Abgrenzung */
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Hover-Effekt bei den Widgets  */
@@ -82,17 +78,10 @@
 /* Scrollbarer Body (Text schwarz, bricht um) */
 .widget-body {
   flex: 1 1 auto;
-  overflow: auto;
+  overflow: visible;
   -webkit-overflow-scrolling: touch;
   padding-top: 8px;
   color:#2c3e50;
-}
-
-/* Sicherstellen, dass Kinder innerhalb schrumpfen und Zeilen nicht ausbrechen */
-.fenster-widget-area > * {
-  min-width: 0;
-  box-sizing: border-box;
-  height: 100%;
 }
 
 /* Text-Handling */
@@ -115,8 +104,6 @@
   }
 
   .fenster-widget-area {
-    grid-template-columns: 1fr;
-    grid-template-rows: none;
-    grid-auto-rows: auto;
+    column-count: 1;
   }
 }
