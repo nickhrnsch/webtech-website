@@ -21,7 +21,7 @@ export const amountFieldStyles = {
   marginTop: 1,
   marginBottom: 3,
   '& .MuiOutlinedInput-root': {
-    fontSize: '1.2rem',
+    fontSize: '1rem',
   },
 };
 
@@ -42,7 +42,7 @@ export const swapButtonStyles = {
 export const resultFieldStyles = {
   marginTop: 1,
   '& .MuiOutlinedInput-root': {
-    fontSize: '1.4rem',
+    fontSize: '1.1rem',
     fontWeight: 'bold',
     backgroundColor: 'action.hover',
   },

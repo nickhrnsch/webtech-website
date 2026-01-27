@@ -24,10 +24,10 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 // WICHTIG: Ersetzen Sie 'YOUR_GOOGLE_MAPS_API_KEY' mit Ihrem echten API-Schlüssel
 const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
 
-function GoogleMaps() {
+function GoogleMaps({ vacations = [] }) {
   const [map, setMap] = useState(null);
   const [places, setPlaces] = useState([]);
-  const [selectedType, setSelectedType] = useState('restaurant');
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchLocation, setSearchLocation] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -35,6 +35,31 @@ function GoogleMaps() {
   
   const mapRef = useRef(null);
   const serviceRef = useRef(null);
+
+  // Finde den nächsten geplanten Urlaub und setze den Ort
+  useEffect(() => {
+    if (vacations && vacations.length > 0) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Filtere zukünftige Urlaube und sortiere nach Startdatum
+      const futureVacations = vacations
+        .filter(vacation => {
+          const startDate = new Date(vacation.startDate);
+          return startDate >= today;
+        })
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+      
+      // Setze den Ort des nächsten Urlaubs, falls vorhanden
+      if (futureVacations.length > 0 && futureVacations[0].location) {
+        setSearchLocation(futureVacations[0].location);
+      } else {
+        setSearchLocation('');
+      }
+    } else {
+      setSearchLocation('');
+    }
+  }, [vacations]);
 
   // Google Maps laden
   useEffect(() => {
@@ -136,13 +161,19 @@ function GoogleMaps() {
   };
 
   const performPlacesSearch = (location) => {
+    if (!searchQuery.trim()) {
+      setError('Bitte geben Sie einen Suchbegriff ein.');
+      setLoading(false);
+      return;
+    }
+
     const request = {
       location: location,
       radius: 5000, // 5km Radius
-      type: [selectedType]
+      query: searchQuery
     };
 
-    serviceRef.current.nearbySearch(request, (results, status) => {
+    serviceRef.current.textSearch(request, (results, status) => {
       setLoading(false);
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
         // Nehme die Top 10 Ergebnisse
@@ -169,43 +200,32 @@ function GoogleMaps() {
     // In einer produktiven App sollten Marker-Referenzen gespeichert werden
   };
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'restaurant':
+  const getPlaceIcon = (place) => {
+    if (place.types) {
+      if (place.types.includes('restaurant') || place.types.includes('food')) {
         return <RestaurantIcon color="primary" />;
-      case 'lodging':
+      }
+      if (place.types.includes('lodging')) {
         return <HotelIcon color="primary" />;
-      case 'tourist_attraction':
+      }
+      if (place.types.includes('tourist_attraction') || place.types.includes('point_of_interest')) {
         return <AttractionsIcon color="primary" />;
-      default:
-        return <LocationOnIcon color="primary" />;
+      }
     }
-  };
-
-  const getTypeLabel = (type) => {
-    switch (type) {
-      case 'restaurant':
-        return 'Restaurants';
-      case 'lodging':
-        return 'Hotels';
-      case 'tourist_attraction':
-        return 'Sehenswürdigkeiten';
-      default:
-        return type;
-    }
+    return <LocationOnIcon color="primary" />;
   };
 
   return (
     <Box sx={{ display: 'flex', gap: 2, height: '600px', p: 2 }}>
       {/* Linke Seite: Steuerung und Ergebnisse */}
       <Paper elevation={3} sx={{ width: '400px', p: 2, display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h6" gutterBottom>
+        <Typography variant="body1" gutterBottom sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
           Orte in der Nähe finden
         </Typography>
 
         {/* Ort-Eingabe */}
         <TextField
-          label="Ort (optional)"
+          label="Ort"
           variant="outlined"
           fullWidth
           value={searchLocation}
@@ -214,33 +234,21 @@ function GoogleMaps() {
           sx={{ mb: 2 }}
         />
 
-        {/* Typ-Auswahl */}
-        <Typography variant="body2" sx={{ mb: 1 }}>
-          Was möchten Sie finden?
-        </Typography>
-        <ButtonGroup fullWidth sx={{ mb: 2 }}>
-          <Button
-            variant={selectedType === 'restaurant' ? 'contained' : 'outlined'}
-            onClick={() => setSelectedType('restaurant')}
-            startIcon={<RestaurantIcon />}
-          >
-            Restaurants
-          </Button>
-          <Button
-            variant={selectedType === 'lodging' ? 'contained' : 'outlined'}
-            onClick={() => setSelectedType('lodging')}
-            startIcon={<HotelIcon />}
-          >
-            Hotels
-          </Button>
-          <Button
-            variant={selectedType === 'tourist_attraction' ? 'contained' : 'outlined'}
-            onClick={() => setSelectedType('tourist_attraction')}
-            startIcon={<AttractionsIcon />}
-          >
-            Sehenswürdigkeiten
-          </Button>
-        </ButtonGroup>
+        {/* Such-Eingabe */}
+        <TextField
+          label="Was möchten Sie finden?"
+          variant="outlined"
+          fullWidth
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="z.B. Restaurant, Hotel, Sehenswürdigkeit, Café, Museum..."
+          sx={{ mb: 2 }}
+          onKeyPress={(e) => {
+            if (e.key === 'Enter' && !loading && map && searchQuery.trim()) {
+              searchPlaces();
+            }
+          }}
+        />
 
         {/* Such-Button */}
         <Button
@@ -248,7 +256,7 @@ function GoogleMaps() {
           fullWidth
           startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <SearchIcon />}
           onClick={searchPlaces}
-          disabled={loading || !map}
+          disabled={loading || !map || !searchQuery.trim()}
           sx={{ mb: 2 }}
         >
           {loading ? 'Suche...' : 'Suchen'}
@@ -263,8 +271,8 @@ function GoogleMaps() {
 
         {/* Ergebnisliste */}
         <Box sx={{ flex: 1, overflowY: 'auto' }}>
-          <Typography variant="subtitle2" gutterBottom>
-            {places.length > 0 && `${places.length} ${getTypeLabel(selectedType)} gefunden`}
+          <Typography variant="body2" gutterBottom sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
+            {places.length > 0 && `${places.length} Ergebnisse für "${searchQuery}" gefunden`}
           </Typography>
           <List>
             {places.map((place, index) => (
@@ -285,7 +293,7 @@ function GoogleMaps() {
                 }}
               >
                 <ListItemIcon>
-                  {getTypeIcon(selectedType)}
+                  {getPlaceIcon(place)}
                 </ListItemIcon>
                 <ListItemText
                   primary={place.name}

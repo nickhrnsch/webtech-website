@@ -27,13 +27,12 @@ function Home() {
         </div>
       </Widget>
 
-      <Widget className="maps-widget">
-        <GoogleMaps />
-      </Widget>
-
-
       <Widget className="currency-widget">
         <CurrencyConverter />
+      </Widget>
+
+      <Widget className="maps-widget">
+        <GoogleMaps vacations={vacations} />
       </Widget>
 
       

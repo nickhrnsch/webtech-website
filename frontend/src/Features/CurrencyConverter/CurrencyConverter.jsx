@@ -178,17 +178,17 @@ function CurrencyConverter() {
   return (
     <Card sx={converterCardStyles}>
       <CardContent>
-        <Typography variant="h5" component="h2" gutterBottom align="center">
+        <Typography variant="h6" component="h2" gutterBottom align="center">
           Währungsrechner
         </Typography>
-        <Typography variant="body2" color="text.secondary" align="center" gutterBottom sx={{ fontSize: '0.75rem' }}>
+        <Typography variant="body2" color="text.secondary" align="center" gutterBottom sx={{ fontSize: '0.875rem' }}>
           Aktuelle Wechselkurse von der EZB
         </Typography>
 
         {/* Favoriten-Bereich */}
         {favorites.length > 0 && (
           <Box sx={favoritesBoxStyles}>
-            <Typography variant="subtitle2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold', fontSize: '0.875rem' }}>
               Favoriten:
             </Typography>
             {favorites.map((fav, index) => (
