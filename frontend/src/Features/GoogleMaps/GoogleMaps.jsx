@@ -21,8 +21,11 @@ import AttractionsIcon from '@mui/icons-material/Attractions';
 import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
-// WICHTIG: Ersetzen Sie 'YOUR_GOOGLE_MAPS_API_KEY' mit Ihrem echten API-Schlüssel
-const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
+
+//einkommentieren falls notwendig
+//const GOOGLE_MAPS_API_KEY = 'AIzaSyC4hKVIGMMVAQuU_Yt0RwJ89pdAMy5grOQ';
+const GOOGLE_MAPS_API_KEY = 'auskommentieren falls notwendig';
+
 
 function GoogleMaps({ vacations = [] }) {
   const [map, setMap] = useState(null);
