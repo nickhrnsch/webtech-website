@@ -10,7 +10,6 @@ class UserBase(BaseModel):
     username: str
     email: EmailStr
     name: Optional[str] = None
-    abteilung: Optional[str] = None
 
 
 class UserCreate(UserBase):
@@ -53,7 +52,6 @@ class UserResponse(UserBase):
 class UserProfileUpdate(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
-    abteilung: Optional[str] = None
 
 
 class CurrencyFavorite(BaseModel):

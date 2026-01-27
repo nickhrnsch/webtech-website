@@ -16,7 +16,6 @@ def serialize_user(user: User) -> dict:
         "username": user.username,
         "email": user.email,
         "name": user.name,
-        "abteilung": user.abteilung,
         "currency_favorites": get_currency_favorites(user),
         "created_at": user.created_at,
         "updated_at": user.updated_at,

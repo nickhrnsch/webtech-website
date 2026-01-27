@@ -53,7 +53,6 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
         "username": current_user.username,
         "email": current_user.email,
         "name": current_user.name,
-        "abteilung": current_user.abteilung,
         "currency_favorites": get_currency_favorites(current_user),
         "created_at": current_user.created_at,
         "updated_at": current_user.updated_at,

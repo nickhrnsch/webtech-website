@@ -36,7 +36,6 @@ def create_user(db: Session, user: UserCreate) -> User:
         email=user.email,
         hashed_password=hashed_password,
         name=user.name,
-        abteilung=user.abteilung
     )
     db.add(db_user)
     db.commit()
@@ -64,9 +63,6 @@ def update_user_profile(db: Session, user: User, profile_update: UserProfileUpda
         if existing_user and existing_user.id != user.id:
             raise ValueError("Email bereits vergeben")
         user.email = profile_update.email
-    if profile_update.abteilung is not None:
-        user.abteilung = profile_update.abteilung
-    
     db.commit()
     db.refresh(user)
     return user

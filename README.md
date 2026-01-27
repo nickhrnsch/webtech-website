@@ -33,7 +33,7 @@ Diese Webapplikation ist ein modernes Dashboard mit verschiedenen Widgets und Fe
 ### Benutzerprofil
 
 - **Profil anzeigen** - Benutzerdaten in der Sidebar einsehen
-- **Profil bearbeiten** - Name, E-Mail und Abteilung können geändert werden
+- **Profil bearbeiten** - Name und E-Mail können geändert werden
 - **Avatar-Generierung** - Automatische Avatare basierend auf dem Benutzernamen
 - **Persistente Speicherung** - Alle Änderungen werden in der Datenbank gespeichert
 

@@ -64,7 +64,7 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:3000
 - ✅ User Registrierung
 - ✅ Login/Logout
 - ✅ JWT Token Authentication
-- ✅ Profil bearbeiten (Name, Email, Abteilung)
+- ✅ Profil bearbeiten (Name, Email)
 - ✅ Persistente Speicherung in SQLite Datenbank
 - ✅ Auto-Login bei Page Reload (wenn Token noch gültig)
 - ✅ Protected Routes

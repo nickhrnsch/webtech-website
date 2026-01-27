@@ -18,7 +18,6 @@ export async function updateProfile(profileData) {
     body: JSON.stringify({
       name: profileData.name || null,
       email: profileData.email || null,
-      abteilung: profileData.abteilung || null,
     }),
   });
 }

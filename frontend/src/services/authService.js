@@ -11,7 +11,6 @@ export async function register(userData) {
       email: userData.email,
       password: userData.password,
       name: userData.name || null,
-      abteilung: userData.abteilung || null,
     }),
   });
   return response;

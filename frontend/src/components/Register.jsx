@@ -10,7 +10,6 @@ function Register({ onSwitchToLogin }) {
     password: '',
     confirmPassword: '',
     name: '',
-    abteilung: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,7 +46,6 @@ function Register({ onSwitchToLogin }) {
         email: formData.email,
         password: formData.password,
         name: formData.name || null,
-        abteilung: formData.abteilung || null,
       });
 
       // Automatisch einloggen nach Registrierung
@@ -124,17 +122,6 @@ function Register({ onSwitchToLogin }) {
               id="name"
               name="name"
               value={formData.name}
-              onChange={handleChange}
-              disabled={loading}
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="abteilung">Abteilung</label>
-            <input
-              type="text"
-              id="abteilung"
-              name="abteilung"
-              value={formData.abteilung}
               onChange={handleChange}
               disabled={loading}
             />
