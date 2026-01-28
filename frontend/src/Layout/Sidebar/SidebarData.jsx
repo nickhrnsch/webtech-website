@@ -9,7 +9,7 @@ export const SidebarData = [
   },
   {
     title: "Kalender",
-    icon: new URL('./SidebarIcons/CalendarIcon.png', import.meta.url).href,
+    icon: new URL('./SidebarIcons/CalendarIconBlack.svg', import.meta.url).href,
     type: "image",
     path: "/calendar"
   },
