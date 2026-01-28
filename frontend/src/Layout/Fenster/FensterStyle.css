@@ -28,6 +28,12 @@
   width: 100%;
 }
 
+.big-calendar-wrapper {
+  /* Kalender soll die gesamte Breite der Spaltenfläche nutzen */
+  column-span: all;
+  width: 100%;
+}
+
 /* Items füllen ihre Zelle, passen sich an Inhaltshöhe an */
 .fenster-widget-area > * {
   break-inside: avoid;

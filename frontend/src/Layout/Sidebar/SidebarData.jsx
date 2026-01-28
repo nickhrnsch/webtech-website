@@ -2,10 +2,16 @@ import React from "react";
 
 export const SidebarData = [
   {
-    title: "Home",
+    title: "Dashboard",
     icon: new URL('./SidebarIcons/HomeIcon.png', import.meta.url).href,
     type: "image",
     path: "/"
+  },
+  {
+    title: "Kalender",
+    icon: new URL('./SidebarIcons/CalendarIcon.png', import.meta.url).href,
+    type: "image",
+    path: "/calendar"
   },
   {
     title: "About",

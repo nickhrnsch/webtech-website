@@ -4,6 +4,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Sidebar from "./Layout/Sidebar/Sidebar.jsx";
 import Home from "./pages/Home.jsx";
+import Calendar from "./pages/Calendar.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
 
@@ -16,6 +17,7 @@ function App() {
             <Sidebar />
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/calendar" element={<Calendar />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<Navigate to="/" replace />} />
