@@ -3,7 +3,7 @@ import React from "react";
 export const SidebarData = [
   {
     title: "Dashboard",
-    icon: new URL('./SidebarIcons/HomeIcon.png', import.meta.url).href,
+    icon: new URL('./SidebarIcons/HomeIcon.svg', import.meta.url).href,
     type: "image",
     path: "/"
   },
@@ -15,13 +15,13 @@ export const SidebarData = [
   },
   {
     title: "About",
-    icon: new URL('./SidebarIcons/AboutIcon.png', import.meta.url).href,
+    icon: new URL('./SidebarIcons/AboutIcon.svg', import.meta.url).href,
     type: "image",
     path: "/about"
   },
   {
     title: "Contact",
-    icon: new URL('./SidebarIcons/KontaktIcon.png', import.meta.url).href,
+    icon: new URL('./SidebarIcons/KontaktIcon.svg', import.meta.url).href,
     type: "image",
     path: "/contact"
   }
