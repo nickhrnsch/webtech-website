@@ -2,6 +2,7 @@ import * as React from "react";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import "dayjs/locale/de";
+import { listVacations, createVacation, updateVacation, createShareLink, acceptShareCode } from "../../services/vacationService";
 import Badge from "@mui/material/Badge";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -225,6 +226,43 @@ export default function DateCalendarServerRequest({ onVacationsChange, selectedD
   const [calendarMenuAnchor, setCalendarMenuAnchor] = React.useState(null);
   const [selectedVacationForExport, setSelectedVacationForExport] = React.useState(null);
 
+  // Lade Urlaube beim Mount
+  useEffect(() => {
+    async function loadVacations() {
+      try {
+        const data = await listVacations();
+        // Convert API data to component format with days[]
+        const vacationsWithDays = data.map(v => {
+          const days = [];
+          let currentDay = dayjs(v.start_date);
+          const endDay = dayjs(v.end_date);
+          
+          while (currentDay.isBefore(endDay) || currentDay.isSame(endDay, "day")) {
+            days.push(currentDay.format("YYYY-MM-DD"));
+            currentDay = currentDay.add(1, "day");
+          }
+          
+          return {
+            id: v.id,
+            startDate: v.start_date,
+            endDate: v.end_date,
+            location: v.location,
+            people: v.people,
+            days: days,
+            weatherData: null, // Wetter wird bei Bedarf neu abgerufen
+          };
+        });
+        setVacations(vacationsWithDays);
+      } catch (error) {
+        console.error("Fehler beim Laden der Urlaube:", error);
+        setSnackbarMessage("Fehler beim Laden der Urlaube");
+        setSnackbarOpen(true);
+      }
+    }
+    
+    loadVacations();
+  }, []);
+
   // Benachrichtige Parent-Komponente über Änderungen der Urlaube
   useEffect(() => {
     if (onVacationsChange) {
@@ -232,46 +270,74 @@ export default function DateCalendarServerRequest({ onVacationsChange, selectedD
     }
   }, [vacations, onVacationsChange]);
 
-  // WMO Weather Code zu Beschreibung (vereinfacht)
-  // Prüfe beim Laden auf geteilte Urlaube in der URL
+  // Prüfe beim Laden auf geteilte Urlaube via share_code in der URL
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const sharedVacation = urlParams.get('vacation');
+    const shareCode = urlParams.get('vacationShare');
     
-    if (sharedVacation) {
-      try {
-        const decoded = JSON.parse(decodeURIComponent(sharedVacation));
-        setSharedVacationData(decoded);
-        setConfirmDialogOpen(true);
-        // Entferne Parameter aus URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } catch (error) {
-        console.error("Fehler beim Laden des geteilten Urlaubs:", error);
+    if (shareCode) {
+      // Accept share code via API
+      async function acceptShare() {
+        try {
+          await acceptShareCode(shareCode);
+          setSnackbarMessage("Urlaub erfolgreich geteilt!");
+          setSnackbarOpen(true);
+          // Reload vacations
+          const data = await listVacations();
+          const vacationsWithDays = data.map(v => {
+            const days = [];
+            let currentDay = dayjs(v.start_date);
+            const endDay = dayjs(v.end_date);
+            
+            while (currentDay.isBefore(endDay) || currentDay.isSame(endDay, "day")) {
+              days.push(currentDay.format("YYYY-MM-DD"));
+              currentDay = currentDay.add(1, "day");
+            }
+            
+            return {
+              id: v.id,
+              startDate: v.start_date,
+              endDate: v.end_date,
+              location: v.location,
+              people: v.people,
+              days: days,
+              weatherData: null,
+            };
+          });
+          setVacations(vacationsWithDays);
+        } catch (error) {
+          console.error("Fehler beim Akzeptieren des Share-Codes:", error);
+          setSnackbarMessage("Fehler beim Teilen des Urlaubs");
+          setSnackbarOpen(true);
+        }
       }
+      
+      acceptShare();
+      // Entferne Parameter aus URL
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
-  const handleShareVacation = (vacation) => {
-    const shareData = {
-      startDate: vacation.startDate,
-      endDate: vacation.endDate,
-      location: vacation.location,
-      people: vacation.people,
-      weatherData: vacation.weatherData,
-    };
-    
-    const encoded = encodeURIComponent(JSON.stringify(shareData));
-    const shareUrl = `${window.location.origin}${window.location.pathname}?vacation=${encoded}`;
-    
-    // Kopiere Link in Zwischenablage
-    navigator.clipboard.writeText(shareUrl).then(() => {
-      setSnackbarMessage("Link wurde in die Zwischenablage kopiert!");
+  const handleShareVacation = async (vacation) => {
+    try {
+      const response = await createShareLink(vacation.id);
+      // Build share URL with frontend origin
+      const shareUrl = `${window.location.origin}/calendar?vacationShare=${response.share_code}`;
+      
+      // Kopiere Share-URL in Zwischenablage
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        setSnackbarMessage("Link wurde in die Zwischenablage kopiert!");
+        setSnackbarOpen(true);
+      }).catch((err) => {
+        console.error("Fehler beim Kopieren:", err);
+        setSnackbarMessage("Fehler beim Kopieren des Links");
+        setSnackbarOpen(true);
+      });
+    } catch (error) {
+      console.error("Fehler beim Erstellen des Share-Links:", error);
+      setSnackbarMessage("Fehler beim Erstellen des Share-Links");
       setSnackbarOpen(true);
-    }).catch((err) => {
-      console.error("Fehler beim Kopieren:", err);
-      setSnackbarMessage("Fehler beim Kopieren des Links");
-      setSnackbarOpen(true);
-    });
+    }
   };
 
   const handleExportToGoogleCalendar = (vacation) => {
@@ -528,7 +594,7 @@ END:VCALENDAR`;
     setEditingVacationId(null);
   };
 
-  const handleSaveVacation = () => {
+  const handleSaveVacation = async () => {
     if (vacationStart && vacationEnd) {
       const days = [];
       let currentDay = vacationStart.clone();
@@ -541,38 +607,61 @@ END:VCALENDAR`;
         currentDay = currentDay.add(1, "day");
       }
 
-      if (isEditingVacation && editingVacationId) {
-        // Update bestehenden Urlaub
-        setVacations((prev) => 
-          prev.map((v) => 
-            v.id === editingVacationId
-              ? {
-                  ...v,
-                  startDate: vacationStart.format("YYYY-MM-DD"),
-                  endDate: vacationEnd.format("YYYY-MM-DD"),
-                  location: vacationLocation,
-                  people: vacationPeople,
-                  weatherData: weatherData,
-                  days: days,
-                }
-              : v
-          )
-        );
-        console.log("Urlaub aktualisiert:", editingVacationId);
-      } else {
-        // Speichere neuen Urlaub
-        const vacation = {
-          id: Date.now(),
-          startDate: vacationStart.format("YYYY-MM-DD"),
-          endDate: vacationEnd.format("YYYY-MM-DD"),
-          location: vacationLocation,
-          people: vacationPeople,
-          weatherData: weatherData,
-          days: days,
-        };
+      try {
+        if (isEditingVacation && editingVacationId) {
+          // Update bestehenden Urlaub via API
+          const updated = await updateVacation(editingVacationId, {
+            start_date: vacationStart.format("YYYY-MM-DD"),
+            end_date: vacationEnd.format("YYYY-MM-DD"),
+            location: vacationLocation,
+            people: vacationPeople,
+          });
+          
+          // Update local state
+          setVacations((prev) => 
+            prev.map((v) => 
+              v.id === editingVacationId
+                ? {
+                    id: updated.id,
+                    startDate: updated.start_date,
+                    endDate: updated.end_date,
+                    location: updated.location,
+                    people: updated.people,
+                    weatherData: weatherData,
+                    days: days,
+                  }
+                : v
+            )
+          );
+          setSnackbarMessage("Urlaub aktualisiert!");
+          setSnackbarOpen(true);
+        } else {
+          // Speichere neuen Urlaub via API
+          const created = await createVacation({
+            start_date: vacationStart.format("YYYY-MM-DD"),
+            end_date: vacationEnd.format("YYYY-MM-DD"),
+            location: vacationLocation,
+            people: vacationPeople,
+          });
+          
+          const vacation = {
+            id: created.id,
+            startDate: created.start_date,
+            endDate: created.end_date,
+            location: created.location,
+            people: created.people,
+            weatherData: weatherData,
+            days: days,
+          };
 
-        setVacations((prev) => [...prev, vacation]);
-        console.log("Urlaub gespeichert:", vacation);
+          setVacations((prev) => [...prev, vacation]);
+          setSnackbarMessage("Urlaub erstellt!");
+          setSnackbarOpen(true);
+        }
+      } catch (error) {
+        console.error("Fehler beim Speichern des Urlaubs:", error);
+        setSnackbarMessage("Fehler beim Speichern des Urlaubs");
+        setSnackbarOpen(true);
       }
     }
     handleCloseVacationDialog();

@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import engine, Base
 from sqlalchemy import text
-from app.routers import auth, users
+from app.routers import auth, users, vacations
 from app.dependencies import get_current_user
 from app.schemas import UserResponse
 from app.models import User
@@ -43,6 +43,7 @@ app.add_middleware(
 # Router einbinden
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(vacations.router)
 
 # Override /api/auth/me endpoint mit Dependency
 @app.get("/api/auth/me", response_model=UserResponse, tags=["auth"])

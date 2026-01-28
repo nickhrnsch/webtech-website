@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, EmailStr, field_validator, Field
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, date
 
 
 # User Schemas
@@ -75,3 +75,51 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+
+# Vacation Schemas
+class VacationBase(BaseModel):
+    start_date: date
+    end_date: date
+    location: Optional[str] = None
+    people: Optional[str] = None
+
+
+class VacationCreate(VacationBase):
+    pass
+
+
+class VacationUpdate(BaseModel):
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    location: Optional[str] = None
+    people: Optional[str] = None
+
+
+class VacationParticipantResponse(BaseModel):
+    user_id: int
+    username: str
+    role: str
+    
+    class Config:
+        from_attributes = True
+
+
+class VacationResponse(VacationBase):
+    id: int
+    share_code: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+    participants: Optional[List[VacationParticipantResponse]] = None
+    
+    class Config:
+        from_attributes = True
+
+
+class VacationShareResponse(BaseModel):
+    share_code: str
+    share_url: str
+
+
+class VacationShareAccept(BaseModel):
+    share_code: str

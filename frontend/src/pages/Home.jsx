@@ -5,6 +5,7 @@ import MUICalender from "../Features/MUICalendar/Calendar.jsx";
 import CurrencyConverter from "../Features/CurrencyConverter/CurrencyConverter.jsx";
 import NextEventsList from "../Features/NextEventsList/NextEventsList.jsx";
 import GoogleMaps from "../Features/GoogleMaps/GoogleMaps.jsx";
+import UpcomingVacationsWidget from "../Features/Vacations/UpcomingVacationsWidget.jsx";
 
 function Home() {
   const [vacations, setVacations] = useState([]);
@@ -36,6 +37,9 @@ function Home() {
         <GoogleMaps vacations={vacations} />
       </Widget>
 
+      <Widget className="upcoming-vacations-widget">
+        <UpcomingVacationsWidget />
+      </Widget>
       
     </Fenster>
   );

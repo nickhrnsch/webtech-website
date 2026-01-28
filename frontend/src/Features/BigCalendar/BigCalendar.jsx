@@ -1,8 +1,9 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Calendar as RBCalendar, dayjsLocalizer, Views } from "react-big-calendar";
 import dayjs from "dayjs";
 import "dayjs/locale/de";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import { listVacations } from "../../services/vacationService";
 
 dayjs.locale("de");
 
@@ -25,30 +26,48 @@ const messages = {
 function BigCalendar() {
   const [date, setDate] = useState(new Date());
   const [view, setView] = useState(Views.MONTH);
+  const [vacations, setVacations] = useState([]);
+  const [showVacations, setShowVacations] = useState(true);
 
-  const events = useMemo(
-    () => [
-      {
-        title: "Beispieltermin",
-        start: new Date(),
-        end: new Date(new Date().getTime() + 60 * 60 * 1000),
-        allDay: false,
-      },
-      {
-        title: "Ganztägiger Event",
-        start: new Date(new Date().setDate(new Date().getDate() + 3)),
-        end: new Date(new Date().setDate(new Date().getDate() + 3)),
+  // Lade Urlaube beim Mount
+  useEffect(() => {
+    async function loadVacations() {
+      try {
+        const data = await listVacations();
+        setVacations(data);
+      } catch (error) {
+        console.error("Fehler beim Laden der Urlaube:", error);
+      }
+    }
+    
+    loadVacations();
+  }, []);
+
+  // Mappe Urlaube zu Kalender-Events
+  const events = useMemo(() => {
+    if (!showVacations) {
+      return [];
+    }
+    
+    return vacations.map(vacation => {
+      const startDate = dayjs(vacation.start_date).toDate();
+      // Add 1 day to end_date for correct display (react-big-calendar expects exclusive end for allDay events)
+      const endDate = dayjs(vacation.end_date).add(1, 'day').toDate();
+      
+      return {
+        title: vacation.location ? `Urlaub: ${vacation.location}` : 'Urlaub',
+        start: startDate,
+        end: endDate,
         allDay: true,
-      },
-      {
-        title: "Meeting",
-        start: new Date(new Date().setDate(new Date().getDate() - 2)),
-        end: new Date(new Date().setDate(new Date().getDate() - 2)),
-        allDay: false,
-      },
-    ],
-    []
-  );
+        resource: {
+          type: 'vacation',
+          vacationId: vacation.id,
+          location: vacation.location,
+          people: vacation.people,
+        }
+      };
+    });
+  }, [vacations, showVacations]);
 
   const handleNavigate = useCallback((newDate) => {
     setDate(newDate);
@@ -70,6 +89,16 @@ function BigCalendar() {
 
   return (
     <div className="big-calendar-wrapper">
+      <div style={{ marginBottom: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={showVacations}
+            onChange={(e) => setShowVacations(e.target.checked)}
+          />
+          {" "}Urlaube anzeigen
+        </label>
+      </div>
       <RBCalendar
         localizer={localizer}
         events={events}
