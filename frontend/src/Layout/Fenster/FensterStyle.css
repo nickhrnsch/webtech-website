@@ -34,6 +34,32 @@
   width: 100%;
 }
 
+.vacation-plan-layout {
+  column-span: all;
+  width: 100%;
+}
+
+.vacation-plan-maps-row {
+  align-items: flex-start;
+}
+
+.maps-widget-compact.widget-card {
+  height: auto !important;
+}
+
+.maps-widget-compact .widget-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Großes Widget: volle Breite + Mindesthöhe (z. B. About-Seite) */
+.widget-fullspace {
+  column-span: all;
+  width: 100%;
+  min-height: calc(100vh - 200px);
+}
+
 /* Items füllen ihre Zelle, passen sich an Inhaltshöhe an */
 .fenster-widget-area > * {
   break-inside: avoid;

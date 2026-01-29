@@ -4,7 +4,7 @@ import Widget from "../Layout/Widgets/Widget";
 function About() {
   return (
     <Fenster title="Über uns">
-      <Widget>
+      <Widget className="widget-fullspace">
         <div style={{ padding: '20px' }}>
           <h2>Über den Urlaubsplaner</h2>
           <p>

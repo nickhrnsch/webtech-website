@@ -28,6 +28,11 @@ class Vacation(Base):
     end_date = Column(Date, nullable=False)
     location = Column(String, nullable=True)
     people = Column(String, nullable=True)
+    title = Column(String, nullable=True)
+    notes = Column(Text, nullable=True)
+    accommodation = Column(String, nullable=True)
+    vacation_type = Column(String, nullable=True)  # e.g. Strand, Städtereise, Wandern, Ski, Roadtrip, Kreuzfahrt, Sonstiges
+    link = Column(String, nullable=True)
     share_code = Column(String, unique=True, index=True, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

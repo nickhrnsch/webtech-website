@@ -12,6 +12,11 @@ def create_vacation(db: Session, owner_user: User, payload: VacationCreate) -> V
         end_date=payload.end_date,
         location=payload.location,
         people=payload.people,
+        title=payload.title,
+        notes=payload.notes,
+        accommodation=payload.accommodation,
+        vacation_type=payload.vacation_type,
+        link=payload.link,
     )
     db.add(vacation)
     db.flush()  # Flush to get vacation.id
@@ -73,7 +78,17 @@ def update_vacation(db: Session, user: User, vacation_id: int, payload: Vacation
         vacation.location = payload.location
     if payload.people is not None:
         vacation.people = payload.people
-    
+    if payload.title is not None:
+        vacation.title = payload.title
+    if payload.notes is not None:
+        vacation.notes = payload.notes
+    if payload.accommodation is not None:
+        vacation.accommodation = payload.accommodation
+    if payload.vacation_type is not None:
+        vacation.vacation_type = payload.vacation_type
+    if payload.link is not None:
+        vacation.link = payload.link
+
     db.commit()
     db.refresh(vacation)
     return vacation

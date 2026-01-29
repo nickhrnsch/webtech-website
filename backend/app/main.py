@@ -21,7 +21,18 @@ with engine.connect() as connection:
             connection.execute(text("ALTER TABLE users ADD COLUMN currency_favorites TEXT"))
             connection.commit()
     except Exception:
-        # If migration fails, allow app to start; user can reset DB if needed
+        pass
+
+# Lightweight migration: ensure vacation extension columns exist (title, notes, accommodation, vacation_type, link)
+with engine.connect() as conn:
+    try:
+        res = conn.execute(text("PRAGMA table_info(vacations)"))
+        vac_cols = [row[1] for row in res.fetchall()]
+        for col, ctype in [("title", "TEXT"), ("notes", "TEXT"), ("accommodation", "TEXT"), ("vacation_type", "TEXT"), ("link", "TEXT")]:
+            if col not in vac_cols:
+                conn.execute(text(f"ALTER TABLE vacations ADD COLUMN {col} {ctype}"))
+        conn.commit()
+    except Exception:
         pass
 
 # FastAPI App erstellen

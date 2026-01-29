@@ -83,6 +83,11 @@ class VacationBase(BaseModel):
     end_date: date
     location: Optional[str] = None
     people: Optional[str] = None
+    title: Optional[str] = None
+    notes: Optional[str] = None
+    accommodation: Optional[str] = None
+    vacation_type: Optional[str] = None
+    link: Optional[str] = None
 
 
 class VacationCreate(VacationBase):
@@ -94,6 +99,11 @@ class VacationUpdate(BaseModel):
     end_date: Optional[date] = None
     location: Optional[str] = None
     people: Optional[str] = None
+    title: Optional[str] = None
+    notes: Optional[str] = None
+    accommodation: Optional[str] = None
+    vacation_type: Optional[str] = None
+    link: Optional[str] = None
 
 
 class VacationParticipantResponse(BaseModel):

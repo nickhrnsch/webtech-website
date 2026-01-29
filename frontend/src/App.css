@@ -18,10 +18,14 @@
 
 .maps-widget.widget-card {
     height: auto !important;
+    min-height: 0; /* Flex-Kind kann schrumpfen */
 }
 
 .maps-widget .widget-body {
-    height: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
 .currency-widget.widget-card {

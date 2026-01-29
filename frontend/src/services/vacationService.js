@@ -20,22 +20,27 @@ export async function createVacation(payload) {
       end_date: payload.end_date,
       location: payload.location || null,
       people: payload.people || null,
+      title: payload.title ?? null,
+      notes: payload.notes ?? null,
+      accommodation: payload.accommodation ?? null,
+      vacation_type: payload.vacation_type ?? null,
+      link: payload.link ?? null,
     }),
   });
 }
 
 /**
- * Aktualisiert einen Urlaub
+ * Aktualisiert einen Urlaub. Nur übergebene Felder werden aktualisiert.
  */
 export async function updateVacation(id, payload) {
+  const keys = ['start_date', 'end_date', 'location', 'people', 'title', 'notes', 'accommodation', 'vacation_type', 'link'];
+  const body = {};
+  for (const k of keys) {
+    if (payload[k] !== undefined) body[k] = payload[k] || null;
+  }
   return await apiRequest(`/api/vacations/${id}`, {
     method: 'PUT',
-    body: JSON.stringify({
-      start_date: payload.start_date || null,
-      end_date: payload.end_date || null,
-      location: payload.location || null,
-      people: payload.people || null,
-    }),
+    body: JSON.stringify(body),
   });
 }
 

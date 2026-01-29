@@ -72,7 +72,7 @@ function UpcomingVacationsWidget({ vacations: externalVacations, refreshTrigger 
             <TableRow>
               <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Von</TableCell>
               <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Bis</TableCell>
-              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Ort</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Titel / Ort</TableCell>
               <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Personen</TableCell>
             </TableRow>
           </TableHead>
@@ -89,7 +89,7 @@ function UpcomingVacationsWidget({ vacations: externalVacations, refreshTrigger 
                   <TableCell>
                     {endDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   </TableCell>
-                  <TableCell>{vacation.location || '-'}</TableCell>
+                  <TableCell>{vacation.title || vacation.location || '-'}</TableCell>
                   <TableCell>{vacation.people || '-'}</TableCell>
                 </TableRow>
               );

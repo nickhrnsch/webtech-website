@@ -4,7 +4,6 @@ import Widget from "../Layout/Widgets/Widget";
 import SmallCalender from "../Features/MUICalendar/Calendar.jsx";
 import CurrencyConverter from "../Features/CurrencyConverter/CurrencyConverter.jsx";
 import NextEventsList from "../Features/NextEventsList/NextEventsList.jsx";
-import GoogleMaps from "../Features/GoogleMaps/GoogleMaps.jsx";
 import UpcomingVacationsWidget from "../Features/Vacations/UpcomingVacationsWidget.jsx";
 
 function Home() {
@@ -17,7 +16,9 @@ function Home() {
 
   return (
     <Fenster title="Dashboard">
-      
+      <Widget className="upcoming-vacations-widget">
+        <UpcomingVacationsWidget vacations={vacations} />
+      </Widget>
       <Widget className="calendar-widget">
         <div className="calendar-events-container">
           <SmallCalender 
@@ -33,13 +34,6 @@ function Home() {
         <CurrencyConverter />
       </Widget>
 
-      <Widget className="maps-widget">
-        <GoogleMaps vacations={vacations} />
-      </Widget>
-
-      <Widget className="upcoming-vacations-widget">
-        <UpcomingVacationsWidget vacations={vacations} />
-      </Widget>
       
     </Fenster>
   );

@@ -15,12 +15,6 @@ function Contact() {
             <p><strong>Telefon:</strong> +49 123 456789</p>
             <p><strong>Adresse:</strong> Musterstraße 123, 12345 Musterstadt</p>
           </div>
-
-          <div style={{ marginTop: '30px' }}>
-            <h3>Öffnungszeiten</h3>
-            <p>Montag - Freitag: 9:00 - 17:00 Uhr</p>
-            <p>Samstag - Sonntag: Geschlossen</p>
-          </div>
         </div>
       </Widget>
     </Fenster>

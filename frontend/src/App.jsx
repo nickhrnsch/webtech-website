@@ -7,6 +7,7 @@ import Home from "./pages/Home.jsx";
 import Calendar from "./pages/Calendar.jsx";
 import About from "./pages/About.jsx";
 import Contact from "./pages/Contact.jsx";
+import VacationPlan from "./pages/VacationPlan.jsx";
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/calendar" element={<Calendar />} />
+              <Route path="/vacation-plan" element={<VacationPlan />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="*" element={<Navigate to="/" replace />} />
