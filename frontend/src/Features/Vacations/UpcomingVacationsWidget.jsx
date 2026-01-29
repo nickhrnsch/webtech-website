@@ -1,8 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { listVacations } from "../../services/vacationService";
-import "./UpcomingVacationsWidget.css";
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 
-function UpcomingVacationsWidget() {
+function UpcomingVacationsWidget({ vacations: externalVacations, refreshTrigger }) {
   const [vacations, setVacations] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,52 +38,66 @@ function UpcomingVacationsWidget() {
     }
     
     loadVacations();
-  }, []);
+  }, [refreshTrigger, externalVacations]);
 
   if (loading) {
-    return <div className="upcoming-vacations-widget">Lädt...</div>;
+    return (
+      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", p: 3 }}>
+        <CircularProgress />
+      </Box>
+    );
   }
 
   if (vacations.length === 0) {
     return (
-      <div className="upcoming-vacations-widget">
-        <h3>Kommende Urlaube</h3>
-        <p className="no-vacations">Keine kommenden Urlaube geplant.</p>
-      </div>
+      <Box sx={{ p: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          Kommende Urlaube
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Keine kommenden Urlaube geplant.
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <div className="upcoming-vacations-widget">
-      <h3>Kommende Urlaube</h3>
-      <div className="vacations-table-container">
-        <table className="vacations-table">
-          <thead>
-            <tr>
-              <th>Von</th>
-              <th>Bis</th>
-              <th>Ort</th>
-              <th>Personen</th>
-            </tr>
-          </thead>
-          <tbody>
+    <Box>
+      <Typography variant="h6" sx={{ p: 2, pb: 1 }}>
+        Kommende Urlaube
+      </Typography>
+      <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Von</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Bis</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Ort</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Personen</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
             {vacations.map((vacation) => {
               const startDate = new Date(vacation.start_date);
               const endDate = new Date(vacation.end_date);
               
               return (
-                <tr key={vacation.id}>
-                  <td>{startDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
-                  <td>{endDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
-                  <td>{vacation.location || '-'}</td>
-                  <td>{vacation.people || '-'}</td>
-                </tr>
+                <TableRow key={vacation.id} hover>
+                  <TableCell>
+                    {startDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                  </TableCell>
+                  <TableCell>
+                    {endDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                  </TableCell>
+                  <TableCell>{vacation.location || '-'}</TableCell>
+                  <TableCell>{vacation.people || '-'}</TableCell>
+                </TableRow>
               );
             })}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   );
 }
 
