@@ -2,8 +2,9 @@ import * as React from "react";
 import dayjs from "dayjs";
 import { useEffect } from "react";
 import "dayjs/locale/de";
+import Calendar from "react-calendar";
+import "react-calendar/dist/Calendar.css";
 import { listVacations, createVacation, updateVacation, createShareLink, acceptShareCode } from "../../services/vacationService";
-import Badge from "@mui/material/Badge";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -18,7 +19,6 @@ import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import WbSunnyIcon from "@mui/icons-material/WbSunny";
 import ShareIcon from "@mui/icons-material/Share";
-import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import Snackbar from "@mui/material/Snackbar";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
@@ -32,11 +32,7 @@ import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { PickersDay } from "@mui/x-date-pickers/PickersDay";
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-
-const initialValue = dayjs();
 
 // Deutsche Feiertage (vereinfachte Liste, kann erweitert werden)
 const holidays = [
@@ -106,27 +102,6 @@ function isHoliday(dayKey) {
   return holidays.includes(dayKey);
 }
 
-function getDayBackgroundColor(day, dayKey, isVacation) {
-  if (isVacation) {
-    // Urlaubstage mit Saisonfarben
-    const month = day.month() + 1;
-    if (month >= 3 && month <= 5) return "rgba(255, 192, 203, 0.4)"; // Frühling
-    if (month >= 6 && month <= 8) return "rgba(144, 238, 144, 0.4)"; // Sommer
-    if (month >= 9 && month <= 11) return "rgba(255, 140, 0, 0.4)"; // Herbst
-    return "rgba(173, 216, 230, 0.4)"; // Winter
-  }
-
-  if (isHoliday(dayKey)) {
-    return "rgba(255, 215, 0, 0.2)"; // Gold/Gelb für Feiertage
-  }
-
-  if (isWeekend(day)) {
-    return "rgba(173, 216, 230, 0.15)"; // Hellblau für Wochenende
-  }
-
-  return "rgba(240, 240, 240, 0.15)"; // Sehr blasses Grau für Arbeitstage
-}
-
 function getSeasonEmoji(month) {
   // Frühling: März(3), April(4), Mai(5)
   if (month >= 3 && month <= 5) return "🌸";
@@ -136,66 +111,6 @@ function getSeasonEmoji(month) {
   if (month >= 9 && month <= 11) return "🍂";
   // Winter: Dezember(12), Januar(1), Februar(2)
   return "❄️";
-}
-
-function ServerDay(props) {
-  const {
-    day,
-    outsideCurrentMonth,
-    onDayDoubleClick,
-    onDayClick,
-    selectedDate,
-    notes = {},
-    vacationDays = [],
-    ...other
-  } = props;
-
-  const dayKey = day.format("YYYY-MM-DD");
-  const hasNote =
-    !outsideCurrentMonth && notes[dayKey] && notes[dayKey].trim() !== "";
-  const vacation = !outsideCurrentMonth && vacationDays.find(v => v.days.includes(dayKey));
-  const isVacation = !!vacation;
-  const isClicked = selectedDate && day.isSame(selectedDate, 'day');
-
-  const month = day.month() + 1; // dayjs months are 0-indexed
-  const vacationEmoji = getSeasonEmoji(month);
-  const bgColor = getDayBackgroundColor(day, dayKey, isVacation);
-
-  const handleDoubleClick = () => {
-    if (!outsideCurrentMonth) {
-      onDayDoubleClick(day);
-    }
-  };
-
-  const handleClick = () => {
-    if (!outsideCurrentMonth && onDayClick) {
-      onDayClick(day);
-    }
-  };
-
-  return (
-    <Badge
-      key={props.day.toString()}
-      overlap="circular"
-      badgeContent={isVacation ? vacationEmoji : hasNote ? "📝" : undefined}
-    >
-      <PickersDay
-        {...other}
-        outsideCurrentMonth={outsideCurrentMonth}
-        day={day}
-        onDoubleClick={handleDoubleClick}
-        onClick={handleClick}
-        sx={{
-          backgroundColor: isClicked ? "rgba(25, 118, 210, 0.3)" : bgColor,
-          border: isClicked ? "2px solid #1976d2" : "none",
-          "&:hover": {
-            backgroundColor: isClicked ? "rgba(25, 118, 210, 0.4)" : bgColor,
-            filter: isClicked ? "none" : "brightness(0.95)",
-          },
-        }}
-      />
-    </Badge>
-  );
 }
 
 export default function DateCalendarServerRequest({ onVacationsChange, selectedDate, onDateChange }) {
@@ -225,6 +140,18 @@ export default function DateCalendarServerRequest({ onVacationsChange, selectedD
   const [confirmDialogOpen, setConfirmDialogOpen] = React.useState(false);
   const [calendarMenuAnchor, setCalendarMenuAnchor] = React.useState(null);
   const [selectedVacationForExport, setSelectedVacationForExport] = React.useState(null);
+  const [lastClickTime, setLastClickTime] = React.useState(0);
+  const [lastClickedDate, setLastClickedDate] = React.useState(null);
+  const [activeStartDate, setActiveStartDate] = React.useState(
+    selectedDate ? selectedDate.toDate() : new Date()
+  );
+
+  // Update activeStartDate when selectedDate changes from outside (e.g., NextEventsList)
+  useEffect(() => {
+    if (selectedDate) {
+      setActiveStartDate(selectedDate.toDate());
+    }
+  }, [selectedDate]);
 
   // Lade Urlaube beim Mount
   useEffect(() => {
@@ -667,38 +594,209 @@ END:VCALENDAR`;
     handleCloseVacationDialog();
   };
 
+  // Helper Funktionen für react-calendar
+  const getTileClassName = ({ date, view }) => {
+    if (view !== 'month') return null;
+    
+    const day = dayjs(date);
+    const dayKey = day.format("YYYY-MM-DD");
+    const vacation = vacations.find(v => v.days.includes(dayKey));
+    const isVacation = !!vacation;
+    
+    const classes = [];
+    
+    if (isHoliday(dayKey)) {
+      classes.push('holiday-tile');
+    }
+    
+    if (isWeekend(day)) {
+      classes.push('weekend-tile');
+    }
+    
+    if (isVacation) {
+      const month = day.month() + 1;
+      if (month >= 3 && month <= 5) classes.push('vacation-spring');
+      else if (month >= 6 && month <= 8) classes.push('vacation-summer');
+      else if (month >= 9 && month <= 11) classes.push('vacation-autumn');
+      else classes.push('vacation-winter');
+    }
+    
+    if (selectedDate && day.isSame(dayjs(selectedDate), 'day')) {
+      classes.push('selected-tile');
+    }
+    
+    return classes.join(' ');
+  };
+
+  const getTileContent = ({ date, view }) => {
+    if (view !== 'month') return null;
+    
+    const day = dayjs(date);
+    const dayKey = day.format("YYYY-MM-DD");
+    const hasNote = notes[dayKey] && notes[dayKey].trim() !== "";
+    const vacation = vacations.find(v => v.days.includes(dayKey));
+    const isVacation = !!vacation;
+    
+    const month = day.month() + 1;
+    const vacationEmoji = getSeasonEmoji(month);
+    
+    if (isVacation) {
+      return <div className="tile-badge">{vacationEmoji}</div>;
+    }
+    
+    if (hasNote) {
+      return <div className="tile-badge">📝</div>;
+    }
+    
+    return null;
+  };
+
+  const handleCalendarClick = (date) => {
+    const day = dayjs(date);
+    const now = Date.now();
+    const dateString = day.format("YYYY-MM-DD");
+    
+    // Rufe onDateChange immer sofort auf für die NextEventsList
+    if (onDateChange) {
+      onDateChange(day);
+    }
+    
+    // Prüfe auf Doppelklick (innerhalb von 300ms und auf das gleiche Datum)
+    if (now - lastClickTime < 300 && lastClickedDate === dateString) {
+      // Doppelklick erkannt - öffne Dialog
+      handleDayDoubleClick(day);
+      setLastClickTime(0);
+      setLastClickedDate(null);
+    } else {
+      // Einzelklick - setze Timer für Doppelklick-Erkennung
+      setLastClickTime(now);
+      setLastClickedDate(dateString);
+    }
+  };
+
+  const handleCalendarDoubleClick = (date) => {
+    const day = dayjs(date);
+    handleDayDoubleClick(day);
+  };
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
-      <DateCalendar
-        value={selectedDate || initialValue}
-        slots={{
-          day: ServerDay,
-        }}
-        slotProps={{
-          day: {
-            notes,
-            vacationDays: vacations,
-            onDayDoubleClick: handleDayDoubleClick,
-            onDayClick: onDateChange,
-            selectedDate: selectedDate,
-          },
-        }}
-        sx={{
-          color: "black",
-          maxWidth: "370px",
-          maxHeight: "320px",
-          margin: "0 auto",
-          "& .MuiPickersDay-root": {
-            color: "black",
-          },
-          "& .MuiDayCalendar-weekDayLabel": {
-            color: "black",
-          },
-          "& .MuiPickersCalendarHeader-label": {
-            color: "black",
-          },
-        }}
-      />
+      <Box sx={{ maxWidth: "370px", margin: "0 auto" }}>
+        <style>{`
+          .react-calendar {
+            border: none;
+            font-family: inherit;
+            width: 100%;
+          }
+          
+          .react-calendar__tile {
+            position: relative;
+            padding: 10px 6px;
+            font-size: 0.875rem;
+            color: black;
+            border-radius: 0;
+            border: 2px solid transparent;
+            box-sizing: border-box;
+          }
+          
+          .react-calendar__tile:enabled:hover {
+            background-color: #e6e6e6;
+          }
+          
+          .react-calendar__tile--active {
+            background: #1976d2 !important;
+            color: white;
+          }
+          
+          .react-calendar__tile--now {
+            background-color: rgba(25, 118, 210, 0.1);
+            border-color: #1976d2;
+          }
+          
+          .react-calendar__tile--now:enabled:hover {
+            background-color: rgba(25, 118, 210, 0.2);
+          }
+          
+          .weekend-tile {
+            background-color: rgba(173, 216, 230, 0.15);
+          }
+          
+          .holiday-tile {
+            background-color: rgba(255, 215, 0, 0.2);
+          }
+          
+          .vacation-spring {
+            background-color: rgba(255, 192, 203, 0.4) !important;
+          }
+          
+          .vacation-summer {
+            background-color: rgba(144, 238, 144, 0.4) !important;
+          }
+          
+          .vacation-autumn {
+            background-color: rgba(255, 140, 0, 0.4) !important;
+          }
+          
+          .vacation-winter {
+            background-color: rgba(173, 216, 230, 0.4) !important;
+          }
+          
+          .selected-tile {
+            border-color: #1976d2 !important;
+            background-color: rgba(25, 118, 210, 0.3) !important;
+          }
+          
+          .tile-badge {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 10px;
+          }
+          
+          .react-calendar__navigation button {
+            min-width: 44px;
+            background: none;
+            font-size: 16px;
+            margin-top: 8px;
+            color: black;
+            border-radius: 0;
+          }
+          
+          .react-calendar__navigation button:enabled:hover,
+          .react-calendar__navigation button:enabled:focus {
+            background-color: #e6e6e6;
+          }
+          
+          .react-calendar__month-view__weekdays {
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            font-size: 0.75rem;
+            color: black;
+          }
+          
+          .react-calendar__month-view__weekdays__weekday {
+            padding: 0.5em;
+          }
+          
+          .react-calendar__month-view__weekdays__weekday abbr {
+            text-decoration: none;
+          }
+          
+          .react-calendar__navigation__label {
+            color: black;
+          }
+        `}</style>
+        <Calendar
+          value={selectedDate ? selectedDate.toDate() : new Date()}
+          onChange={handleCalendarClick}
+          onClickDay={handleCalendarClick}
+          tileClassName={getTileClassName}
+          tileContent={getTileContent}
+          locale="de-DE"
+          minDetail="month"
+        />
+      </Box>
 
       <Dialog
         open={openDialog}
@@ -721,7 +819,7 @@ END:VCALENDAR`;
                     mb: 3,
                     p: 2,
                     bgcolor: "primary.light",
-                    color: "white",
+                    color: "black",
                   }}
                 >
                   <Box sx={{ mb: 2 }}>
@@ -733,7 +831,7 @@ END:VCALENDAR`;
                         <IconButton
                           size="small"
                           onClick={(e) => handleOpenCalendarMenu(e, vacationInfo)}
-                          sx={{ color: "white" }}
+                          sx={{ color: "black" }}
                           title="Zu Kalender hinzufügen"
                         >
                           <CalendarMonthIcon />
@@ -741,7 +839,7 @@ END:VCALENDAR`;
                         <IconButton
                           size="small"
                           onClick={() => handleShareVacation(vacationInfo)}
-                          sx={{ color: "white" }}
+                          sx={{ color: "black" }}
                           title="Urlaub teilen"
                         >
                           <ShareIcon />

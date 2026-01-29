@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Fenster from "../Layout/Fenster/Fenster";
 import Widget from "../Layout/Widgets/Widget";
-import MUICalender from "../Features/MUICalendar/Calendar.jsx";
+import SmallCalender from "../Features/SmallCalendar/Calendar.jsx";
 import CurrencyConverter from "../Features/CurrencyConverter/CurrencyConverter.jsx";
 import NextEventsList from "../Features/NextEventsList/NextEventsList.jsx";
 import GoogleMaps from "../Features/GoogleMaps/GoogleMaps.jsx";
@@ -20,7 +20,7 @@ function Home() {
       
       <Widget className="calendar-widget">
         <div className="calendar-events-container">
-          <MUICalender 
+          <SmallCalender 
             onVacationsChange={setVacations} 
             selectedDate={selectedDate} 
             onDateChange={handleDateClick}
