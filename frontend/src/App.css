@@ -1,7 +1,16 @@
 .app-container {
     height: 100vh;
     width: 100vw;
-    background-color:#f9f9f9;
+    background-color: #f9f9f9;
+}
+
+[data-theme="dark"] .app-container {
+    background-color: var(--theme-background-default, #121212);
+}
+
+[data-theme="dark"] body {
+    background-color: var(--theme-background-default, #121212);
+    color: var(--theme-text-primary);
 }
 
 .calendar-widget.widget-card {

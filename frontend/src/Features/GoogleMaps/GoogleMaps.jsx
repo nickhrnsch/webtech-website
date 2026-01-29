@@ -283,10 +283,11 @@ function GoogleMaps({ vacations = [] }) {
                 key={index}
                 sx={{
                   mb: 1,
-                  border: '1px solid #e0e0e0',
+                  border: '1px solid',
+                  borderColor: 'divider',
                   borderRadius: 1,
                   '&:hover': {
-                    backgroundColor: '#f5f5f5',
+                    backgroundColor: 'action.hover',
                     cursor: 'pointer'
                   }
                 }}

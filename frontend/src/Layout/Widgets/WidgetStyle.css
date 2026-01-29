@@ -1,6 +1,6 @@
 .widget-container {
-  background: white;
-  color: black;
+  background: var(--theme-background-paper, white);
+  color: var(--theme-text-primary, black);
   border-radius: 12px;
   padding: 20px;
   margin: 12px;
@@ -8,9 +8,13 @@
   height: auto;
 }
 
+[data-theme="dark"] .widget-container {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .widget-card {
-  background: white;
-  color: black;
+  background: var(--theme-background-paper, white);
+  color: var(--theme-text-primary, black);
   border-radius: 12px;
   padding: 20px;
   margin: 12px;
@@ -22,7 +26,11 @@
 
 .widget-header {
   margin-bottom: 12px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .widget-header {
+  border-bottom-color: rgba(255, 255, 255, 0.12);
 }
 
 .widget-body {
@@ -30,4 +38,5 @@
   overflow: visible;
   max-width: 100%;
   height: auto;
+  color: var(--theme-text-primary, black);
 }

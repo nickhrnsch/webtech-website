@@ -1,13 +1,20 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import IconButton from "@mui/material/IconButton";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
 import "./SidebarStyle.css";
 import { SidebarData } from "./SidebarData";
 import SidebarProfile from "./SidebarProfile";
 import CalenderIcon from "./SidebarIcons/CalenderIcon.png";
+import { useThemeMode } from "../../context/ThemeContext";
+import { useAuth } from "../../context/AuthContext";
 
 function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { mode, toggleColorMode } = useThemeMode();
+  const { user } = useAuth();
 
   const handleNavigation = (path) => {
     navigate(path);
@@ -39,7 +46,24 @@ function Sidebar() {
         })}
       </ul>
       <div className="sidebar-profile-section">
-        <SidebarProfile />
+        <div className="sidebar-profile-inner">
+          {user && (
+            <IconButton
+              onClick={toggleColorMode}
+              color="inherit"
+              size="medium"
+              aria-label={mode === "dark" ? "Zu Hellmodus wechseln" : "Zu Dunkelmodus wechseln"}
+              className="sidebar-theme-toggle"
+            >
+              {mode === "dark" ? (
+                <Brightness7Icon />
+              ) : (
+                <Brightness4Icon />
+              )}
+            </IconButton>
+          )}
+          <SidebarProfile />
+        </div>
       </div>
     </div>
   );

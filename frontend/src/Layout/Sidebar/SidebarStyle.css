@@ -182,6 +182,18 @@
     justify-content: center;
 }
 
+.sidebar-profile-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.sidebar-theme-toggle {
+    color: inherit;
+}
+
 .sidebar-user-profile:hover {
     background-color: #ffffff;
     transition: all 0.3s ease;
@@ -317,5 +329,106 @@
     background-color: #ffffff;
     border-radius: 4px;
     box-shadow: 0 0 0 2px #1976d2;
+}
+
+/* ---------------------------Dark Mode (data-theme="dark")--------------------------------- */
+
+[data-theme="dark"] .sidebar {
+    background-color: #1e1e1e;
+    color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="dark"] .sidebar h2 {
+    color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="dark"] .sidebar-button {
+    background-color: #1e1e1e;
+    color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="dark"] .sidebar-button:hover {
+    background-color: #2d2d2d;
+    border-color: #00796b;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.25);
+}
+
+[data-theme="dark"] .sidebar-button:focus {
+    border-color: #00796b;
+    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.35);
+}
+
+[data-theme="dark"] .sidebar-button.active {
+    background-color: #2d2d2d;
+    color: rgba(255, 255, 255, 0.87);
+    border-color: #00796b;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.3);
+}
+
+[data-theme="dark"] .sidebar-user-profile {
+    background-color: #2d2d2d;
+    border-color: #404040;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sidebar-user-profile:hover {
+    background-color: #2d2d2d;
+    border-color: #00796b;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.25);
+}
+
+[data-theme="dark"] .sidebar-user-profile:focus {
+    border-color: #00796b;
+    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.35);
+}
+
+[data-theme="dark"] .user-name {
+    color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="dark"] .user-status {
+    color: #22c55e;
+}
+
+[data-theme="dark"] .profile-popup-expanded {
+    background-color: #2d2d2d;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.2);
+}
+
+[data-theme="dark"] .profile-popup-header {
+    background: #00796b;
+}
+
+[data-theme="dark"] .profile-popup-close {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .profile-popup-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="dark"] .profile-detail-item {
+    background-color: #1e1e1e;
+}
+
+[data-theme="dark"] .profile-detail-item strong {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+[data-theme="dark"] .profile-detail-item span {
+    color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="dark"] .profile-detail-item input {
+    color: rgba(255, 255, 255, 0.87);
+}
+
+[data-theme="dark"] .profile-detail-item input:focus {
+    background-color: #2d2d2d;
+    box-shadow: 0 0 0 2px #00796b;
+}
+
+[data-theme="dark"] .sidebar-theme-toggle {
+    color: rgba(255, 255, 255, 0.87);
 }
 

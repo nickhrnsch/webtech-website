@@ -1,9 +1,14 @@
 .calendar-share-section {
   margin-bottom: 16px;
   padding: 12px;
-  background-color: #f5f5f5;
+  background-color: var(--theme-background-paper, #f5f5f5);
   border-radius: 8px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: var(--theme-text-primary, #000);
+}
+
+[data-theme="dark"] .calendar-share-section {
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 .share-input-container {
@@ -15,21 +20,27 @@
 .share-input {
   flex: 1;
   padding: 8px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid rgba(0, 0, 0, 0.23);
   border-radius: 4px;
   font-size: 14px;
-  min-width: 0; /* Allows input to shrink */
+  min-width: 0;
+  background: var(--theme-background-default, #fff);
+  color: var(--theme-text-primary, #000);
+}
+
+[data-theme="dark"] .share-input {
+  border-color: rgba(255, 255, 255, 0.23);
 }
 
 .share-input:focus {
   outline: none;
-  border-color: #1976d2;
-  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+  border-color: var(--theme-primary, #00796B);
+  box-shadow: 0 0 0 2px rgba(var(--theme-primary-rgb, 0, 121, 107), 0.2);
 }
 
 .share-accept-button {
   padding: 8px 16px;
-  background-color: #1976d2;
+  background-color: var(--theme-primary, #00796B);
   color: white;
   border: none;
   border-radius: 4px;
@@ -41,11 +52,11 @@
 }
 
 .share-accept-button:hover {
-  background-color: #1565c0;
+  background-color: var(--theme-primary-dark, #004C40);
 }
 
 .share-accept-button:active {
-  background-color: #0d47a1;
+  filter: brightness(0.9);
 }
 
 .share-message {
@@ -53,8 +64,8 @@
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 14px;
-  background-color: #e3f2fd;
-  color: #1976d2;
+  background-color: rgba(var(--theme-primary-rgb, 0, 121, 107), 0.12);
+  color: var(--theme-primary, #00796B);
 }
 
 .share-message:first-letter {

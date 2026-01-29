@@ -1,0 +1,111 @@
+/**
+ * React Big Calendar – Theme-Overrides (Primary, Today, Off-Range).
+ * Scoped to .big-calendar-wrapper. Urlaube = Events.
+ */
+
+/* Events (Urlaube): Theme Primary statt Blau */
+.big-calendar-wrapper .rbc-event,
+.big-calendar-wrapper .rbc-day-slot .rbc-background-event {
+  background-color: var(--theme-primary, #00796B) !important;
+  border-color: var(--theme-primary-dark, #004C40) !important;
+  color: #fff !important;
+}
+
+.big-calendar-wrapper .rbc-event.rbc-selected,
+.big-calendar-wrapper .rbc-day-slot .rbc-selected.rbc-background-event {
+  background-color: var(--theme-primary-dark, #004C40) !important;
+}
+
+.big-calendar-wrapper .rbc-event:focus,
+.big-calendar-wrapper .rbc-day-slot .rbc-background-event:focus {
+  outline: 5px auto var(--theme-primary, #00796B) !important;
+}
+
+.big-calendar-wrapper .rbc-day-slot .rbc-event,
+.big-calendar-wrapper .rbc-day-slot .rbc-background-event {
+  border: 1px solid var(--theme-primary-dark, #004C40) !important;
+}
+
+/* Heute: dezenter Primary-Ton statt hellblau */
+.big-calendar-wrapper .rbc-today {
+  background-color: rgba(var(--theme-primary-rgb, 0, 121, 107), 0.12) !important;
+}
+
+/* Vorheriger/nächster Monat: Grau, nicht hervorgehoben */
+.big-calendar-wrapper .rbc-off-range {
+  color: var(--theme-text-secondary, #999) !important;
+}
+
+.big-calendar-wrapper .rbc-off-range-bg {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-off-range {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-off-range-bg {
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-today {
+  background-color: rgba(var(--theme-primary-rgb, 0, 121, 107), 0.15) !important;
+}
+
+/* Dark Mode: Kalender-Container, Toolbar, Monatszellen */
+[data-theme="dark"] .big-calendar-wrapper .rbc-calendar {
+  background: var(--theme-background-default, #121212);
+  color: var(--theme-text-primary);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-toolbar,
+[data-theme="dark"] .big-calendar-wrapper .rbc-toolbar .rbc-toolbar-label {
+  color: var(--theme-text-primary);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-toolbar button {
+  color: var(--theme-text-primary);
+  border-color: rgba(255, 255, 255, 0.23);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-toolbar button:hover,
+[data-theme="dark"] .big-calendar-wrapper .rbc-toolbar button:focus {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: var(--theme-primary);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-toolbar button:active,
+[data-theme="dark"] .big-calendar-wrapper .rbc-toolbar button.rbc-active {
+  background-color: rgba(var(--theme-primary-rgb, 0, 121, 107), 0.2);
+  border-color: var(--theme-primary);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-month-view {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: var(--theme-background-paper, #1e1e1e);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-month-row + .rbc-month-row {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-day-bg,
+[data-theme="dark"] .big-calendar-wrapper .rbc-day-bg + .rbc-day-bg {
+  background: var(--theme-background-paper, #1e1e1e);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-header {
+  color: var(--theme-text-primary);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-date-cell,
+[data-theme="dark"] .big-calendar-wrapper .rbc-date-cell > a {
+  color: var(--theme-text-primary);
+}
+
+[data-theme="dark"] .big-calendar-wrapper .rbc-overlay {
+  background: var(--theme-background-paper, #1e1e1e);
+  border-color: rgba(255, 255, 255, 0.12);
+}

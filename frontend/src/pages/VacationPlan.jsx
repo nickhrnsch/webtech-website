@@ -221,7 +221,7 @@ function VacationPlan() {
           <Widget className="vacation-list-widget">
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2, mb: 2 }}>
               <Typography variant="h6">Meine Urlaube</Typography>
-              <Button variant="contained" startIcon={<AddIcon />} onClick={openAddDialog}>
+              <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={openAddDialog}>
                 Urlaub hinzufügen
               </Button>
             </Box>

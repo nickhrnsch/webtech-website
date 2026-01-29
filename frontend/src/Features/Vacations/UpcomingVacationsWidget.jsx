@@ -70,10 +70,10 @@ function UpcomingVacationsWidget({ vacations: externalVacations, refreshTrigger 
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Von</TableCell>
-              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Bis</TableCell>
-              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Titel / Ort</TableCell>
-              <TableCell sx={{ fontWeight: "bold", backgroundColor: "#f0f0f0" }}>Personen</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Von</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Bis</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Titel / Ort</TableCell>
+              <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Personen</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

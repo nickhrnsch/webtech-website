@@ -5,8 +5,8 @@
   right: 20px;
   bottom: 20px;
   border-radius: 26px;
-  background-color:#f9f9f9;
-  color:#2c3e50;
+  background-color: var(--theme-background-default, #f9f9f9);
+  color: var(--theme-text-primary, #2c3e50);
   padding: 5px;
   box-sizing: border-box;
   overflow: auto;
@@ -75,27 +75,35 @@
   flex-direction: column;
   height: auto;
 
-  /* weißer Hintergrund + schwarzer Text */
-  background: hsl(0, 0%, 100%);
-  color: #2c3e50;
+  background: var(--theme-background-paper, #ffffff);
+  color: var(--theme-text-primary, #2c3e50);
 
   border-radius: 12px;
   padding: 20px;
   box-sizing: border-box;
 
-  /* dezente Abgrenzung */
   border: 1px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
   overflow: visible;
 }
 
+[data-theme="dark"] .widget-card {
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 /* Hover-Effekt bei den Widgets  */
 .widget-card:hover {
-    background-color: #ffffff;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    border: 1px solid #667eea;
+  background-color: var(--theme-background-paper, #ffffff);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--theme-primary, #00796B);
+}
+
+[data-theme="dark"] .widget-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 121, 107, 0.25);
+  border-color: var(--theme-primary);
 }
 
 /* Kopf der Karte bleibt sichtbar (Titel schwarz) */
@@ -104,7 +112,7 @@
 }
 .widget-header .widget-title {
   margin: 0;
-  color:#2c3e50;
+  color: var(--theme-text-primary, #2c3e50);
 }
 
 /* Scrollbarer Body (Text schwarz, bricht um) */
@@ -113,7 +121,7 @@
   overflow: visible;
   -webkit-overflow-scrolling: touch;
   padding-top: 8px;
-  color:#2c3e50;
+  color: var(--theme-text-primary, #2c3e50);
 }
 
 /* Text-Handling */

@@ -3,6 +3,7 @@ import { Calendar as RBCalendar, dayjsLocalizer, Views } from "react-big-calenda
 import dayjs from "dayjs";
 import "dayjs/locale/de";
 import "react-big-calendar/lib/css/react-big-calendar.css";
+import "./BigCalendarOverrides.css";
 import { listVacations } from "../../services/vacationService";
 
 dayjs.locale("de");
