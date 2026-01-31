@@ -162,23 +162,23 @@ function VacationList({ vacations, loading, error, onVacationChange, onError }) 
         ) : vacations.length === 0 ? (
           <Typography color="text.secondary">Keine Urlaube. Füge einen hinzu.</Typography>
         ) : (
-          <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 400 }}>
-            <Table stickyHeader size="small">
+          <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
+            <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: "bold" }}>Titel / Ort</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Von</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Bis</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Personen</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }} align="right">Aktionen</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Von</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Bis</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Titel / Ort</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Personen</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }} align="right">Aktionen</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {vacations.map((v) => (
                   <TableRow key={v.id} hover>
-                    <TableCell>{displayTitle(v)}</TableCell>
                     <TableCell>{formatDate(v.start_date)}</TableCell>
                     <TableCell>{formatDate(v.end_date)}</TableCell>
+                    <TableCell>{displayTitle(v)}</TableCell>
                     <TableCell>{v.people || "–"}</TableCell>
                     <TableCell align="right">
                       <IconButton size="small" onClick={() => openEditDialog(v)} title="Bearbeiten">
