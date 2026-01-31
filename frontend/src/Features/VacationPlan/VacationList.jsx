@@ -22,10 +22,16 @@ import {
   FormControl,
   InputLabel,
   Alert,
+  Menu,
+  ListItemIcon,
+  ListItemText,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import ShareIcon from "@mui/icons-material/Share";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -35,6 +41,7 @@ import {
   createVacation,
   updateVacation,
   deleteVacation,
+  createShareLink,
 } from "../../services/vacationService";
 
 const VACATION_TYPES = [
@@ -52,6 +59,8 @@ function VacationList({ vacations, loading, error, onVacationChange, onError }) 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [calendarMenuAnchor, setCalendarMenuAnchor] = useState(null);
+  const [selectedVacationForExport, setSelectedVacationForExport] = useState(null);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -138,8 +147,92 @@ function VacationList({ vacations, loading, error, onVacationChange, onError }) 
     }
   };
 
+  const handleShareVacation = async (vacation) => {
+    try {
+      const response = await createShareLink(vacation.id);
+      const shareUrl = `${window.location.origin}/calendar?vacationShare=${response.share_code}`;
+      
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        onVacationChange("Link wurde in die Zwischenablage kopiert!");
+      }).catch((err) => {
+        console.error("Fehler beim Kopieren:", err);
+        onError("Fehler beim Kopieren des Links");
+      });
+    } catch (error) {
+      console.error("Fehler beim Erstellen des Share-Links:", error);
+      onError("Fehler beim Erstellen des Share-Links");
+    }
+  };
+
+  const handleExportToGoogleCalendar = (vacation) => {
+    const startDate = dayjs(vacation.start_date).format('YYYYMMDD');
+    const endDate = dayjs(vacation.end_date).add(1, 'day').format('YYYYMMDD');
+    
+    const title = vacation.location ? `Urlaub in ${vacation.location}` : 'Urlaub';
+    let description = '';
+    
+    if (vacation.people) {
+      description += `Personen: ${vacation.people}\n`;
+    }
+    
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDate}/${endDate}&details=${encodeURIComponent(description)}&sf=true&output=xml`;
+    
+    window.open(googleCalendarUrl, '_blank');
+    onVacationChange("Google Calendar geöffnet!");
+  };
+
+  const handleDownloadICS = (vacation) => {
+    const startDate = dayjs(vacation.start_date).format('YYYYMMDD');
+    const endDate = dayjs(vacation.end_date).add(1, 'day').format('YYYYMMDD');
+    const now = dayjs().format('YYYYMMDDTHHmmss');
+    
+    const title = vacation.location ? `Urlaub in ${vacation.location}` : 'Urlaub';
+    let description = '';
+    
+    if (vacation.people) {
+      description += `Personen: ${vacation.people}\\n`;
+    }
+    
+    const icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Vacation Calendar//DE
+BEGIN:VEVENT
+UID:${vacation.id}@vacationcalendar
+DTSTAMP:${now}Z
+DTSTART;VALUE=DATE:${startDate}
+DTEND;VALUE=DATE:${endDate}
+SUMMARY:${title}
+DESCRIPTION:${description}
+STATUS:CONFIRMED
+END:VEVENT
+END:VCALENDAR`;
+    
+    const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = window.URL.createObjectURL(blob);
+    link.download = `urlaub_${vacation.start_date}.ics`;
+    link.click();
+    
+    onVacationChange(".ics Datei heruntergeladen!");
+  };
+
+  const handleOpenCalendarMenu = (event, vacation) => {
+    setCalendarMenuAnchor(event.currentTarget);
+    setSelectedVacationForExport(vacation);
+  };
+
+  const handleCloseCalendarMenu = () => {
+    setCalendarMenuAnchor(null);
+    setSelectedVacationForExport(null);
+  };
+
   const displayTitle = (v) => v.title || v.location || "Urlaub";
   const formatDate = (d) => dayjs(d).format("DD.MM.YYYY");
+
+  // Sortiere Urlaube nach Startdatum aufsteigend
+  const sortedVacations = [...vacations].sort((a, b) => 
+    new Date(a.start_date) - new Date(b.start_date)
+  );
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
@@ -170,17 +263,27 @@ function VacationList({ vacations, loading, error, onVacationChange, onError }) 
                   <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Bis</TableCell>
                   <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Titel / Ort</TableCell>
                   <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Personen</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Unterkunft</TableCell>
+                  <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }}>Notizen</TableCell>
                   <TableCell sx={{ fontWeight: "bold", backgroundColor: (t) => t.palette.mode === "dark" ? t.palette.grey[800] : t.palette.grey[200] }} align="right">Aktionen</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {vacations.map((v) => (
+                {sortedVacations.map((v) => (
                   <TableRow key={v.id} hover>
                     <TableCell>{formatDate(v.start_date)}</TableCell>
                     <TableCell>{formatDate(v.end_date)}</TableCell>
                     <TableCell>{displayTitle(v)}</TableCell>
                     <TableCell>{v.people || "–"}</TableCell>
+                    <TableCell>{v.accommodation || "–"}</TableCell>
+                    <TableCell>{v.notes || "–"}</TableCell>
                     <TableCell align="right">
+                      <IconButton size="small" onClick={(e) => handleOpenCalendarMenu(e, v)} title="Zu Kalender hinzufügen">
+                        <CalendarMonthIcon fontSize="small" />
+                      </IconButton>
+                      <IconButton size="small" onClick={() => handleShareVacation(v)} title="Urlaub teilen">
+                        <ShareIcon fontSize="small" />
+                      </IconButton>
                       <IconButton size="small" onClick={() => openEditDialog(v)} title="Bearbeiten">
                         <EditIcon fontSize="small" />
                       </IconButton>
@@ -240,6 +343,35 @@ function VacationList({ vacations, loading, error, onVacationChange, onError }) 
             </Button>
           </DialogActions>
         </Dialog>
+
+        <Menu
+          anchorEl={calendarMenuAnchor}
+          open={Boolean(calendarMenuAnchor)}
+          onClose={handleCloseCalendarMenu}
+        >
+          <MenuItem onClick={() => {
+            if (selectedVacationForExport) {
+              handleExportToGoogleCalendar(selectedVacationForExport);
+            }
+            handleCloseCalendarMenu();
+          }}>
+            <ListItemIcon>
+              <CalendarMonthIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Zu Google Calendar</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={() => {
+            if (selectedVacationForExport) {
+              handleDownloadICS(selectedVacationForExport);
+            }
+            handleCloseCalendarMenu();
+          }}>
+            <ListItemIcon>
+              <FileDownloadIcon fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>.ics Datei herunterladen</ListItemText>
+          </MenuItem>
+        </Menu>
       </Box>
     </LocalizationProvider>
   );

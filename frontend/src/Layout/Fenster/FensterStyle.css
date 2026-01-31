@@ -5,7 +5,6 @@
   right: 20px;
   bottom: 20px;
   border-radius: 26px;
-  background-color: var(--theme-background-default, #f9f9f9);
   color: var(--theme-text-primary, #2c3e50);
   padding: 5px;
   box-sizing: border-box;

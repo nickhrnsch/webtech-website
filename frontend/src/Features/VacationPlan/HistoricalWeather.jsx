@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -16,7 +16,7 @@ import dayjs from "dayjs";
 import "dayjs/locale/de";
 import { getHistoricalForLocation } from "../../services/historicalWeatherService";
 
-function HistoricalWeather() {
+function HistoricalWeather({ vacations = [] }) {
   const [histLocation, setHistLocation] = useState("");
   const [histStart, setHistStart] = useState(dayjs().month(7).date(15));
   const [histEnd, setHistEnd] = useState(dayjs().month(7).date(22));
@@ -25,6 +25,27 @@ function HistoricalWeather() {
   const [histLoading, setHistLoading] = useState(false);
   const [histError, setHistError] = useState(null);
   const [histResult, setHistResult] = useState(null);
+
+  // Finde den nächsten geplanten Urlaub und setze den Ort
+  useEffect(() => {
+    if (vacations && vacations.length > 0) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      // Filtere zukünftige Urlaube und sortiere nach Startdatum
+      const futureVacations = vacations
+        .filter(vacation => {
+          const startDate = new Date(vacation.start_date);
+          return startDate >= today;
+        })
+        .sort((a, b) => new Date(a.start_date) - new Date(b.start_date));
+      
+      // Setze den Ort des nächsten Urlaubs, falls vorhanden
+      if (futureVacations.length > 0 && futureVacations[0].location) {
+        setHistLocation(futureVacations[0].location);
+      }
+    }
+  }, [vacations]);
 
   const loadHistoricalWeather = async () => {
     if (!histLocation.trim() || !histStart || !histEnd) return;

@@ -41,7 +41,7 @@ function VacationPlan() {
   };
 
   return (
-    <Fenster title="Urlaub planen">
+    <Fenster title="Urlaubsplanung">
       <Box className="vacation-plan-layout" sx={{ columnSpan: "all", display: "flex", flexDirection: "column", gap: 2 }}>
         <Widget className="vacation-list-widget">
           <VacationList
@@ -54,12 +54,12 @@ function VacationPlan() {
         </Widget>
 
         <Box className="vacation-plan-maps-row" sx={{ display: "flex", flexDirection: "row", gap: 2, flexWrap: "wrap" }}>
-          <Box sx={{ flex: "0 0 360px", minWidth: 320, maxWidth: "100%", alignSelf: "flex-start" }}>
+          <Box sx={{ flex: 3, minWidth: 400, maxWidth: "100%", alignSelf: "flex-start" }}>
             <Widget className="historical-weather-widget">
-              <HistoricalWeather />
+              <HistoricalWeather vacations={vacations} />
             </Widget>
           </Box>
-          <Box sx={{ flex: "1 1 400px", minWidth: 320, maxWidth: 900 }}>
+          <Box sx={{ flex: 7, minWidth: 400, maxWidth: "100%" }}>
             <Widget className="maps-widget maps-widget-compact">
               <VacationMaps vacations={vacations} />
             </Widget>
