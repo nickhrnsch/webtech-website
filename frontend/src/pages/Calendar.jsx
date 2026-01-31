@@ -2,7 +2,82 @@ import { useState, useEffect } from "react";
 import Fenster from "../Layout/Fenster/Fenster";
 import BigCalendar from "../Features/BigCalendar/BigCalendar.jsx";
 import { acceptShareCode } from "../services/vacationService";
-import "./CalendarPage.css";
+
+const styles = `
+.calendar-share-section {
+  margin-bottom: 16px;
+  padding: 12px;
+  background-color: var(--theme-background-paper, #f5f5f5);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  color: var(--theme-text-primary, #000);
+}
+
+[data-theme="dark"] .calendar-share-section {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.share-input-container {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.share-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  border-radius: 4px;
+  font-size: 14px;
+  min-width: 0;
+  background: var(--theme-background-default, #fff);
+  color: var(--theme-text-primary, #000);
+}
+
+[data-theme="dark"] .share-input {
+  border-color: rgba(255, 255, 255, 0.23);
+}
+
+.share-input:focus {
+  outline: none;
+  border-color: var(--theme-primary, #00796B);
+  box-shadow: 0 0 0 2px rgba(var(--theme-primary-rgb, 0, 121, 107), 0.2);
+}
+
+.share-accept-button {
+  padding: 8px 16px;
+  background-color: var(--theme-primary, #00796B);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.share-accept-button:hover {
+  background-color: var(--theme-primary-dark, #004C40);
+}
+
+.share-accept-button:active {
+  filter: brightness(0.9);
+}
+
+.share-message {
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: rgba(var(--theme-primary-rgb, 0, 121, 107), 0.12);
+  color: var(--theme-primary, #00796B);
+}
+
+.share-message:first-letter {
+  font-size: 16px;
+}
+`;
 
 function Calendar() {
   const [shareInput, setShareInput] = useState("");
@@ -50,6 +125,7 @@ function Calendar() {
 
   return (
     <Fenster title="Kalender">
+      <style>{styles}</style>
       <div className="calendar-share-section">
         <div className="share-input-container">
           <input

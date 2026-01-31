@@ -75,7 +75,7 @@
   flex-direction: column;
   height: auto;
 
-  background: var(--theme-background-paper, #ffffff);
+  background: var(--theme-background-paper, #f9f9f9);
   color: var(--theme-text-primary, #2c3e50);
 
   border-radius: 12px;
@@ -95,7 +95,7 @@
 
 /* Hover-Effekt bei den Widgets  */
 .widget-card:hover {
-  background-color: var(--theme-background-paper, #ffffff);
+  background-color: var(--theme-background-paper, #f9f9f9);
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   border: 1px solid var(--theme-primary, #00796B);

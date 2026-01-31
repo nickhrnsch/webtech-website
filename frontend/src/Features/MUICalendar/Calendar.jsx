@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import "dayjs/locale/de";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { listVacations, createVacation, updateVacation, createShareLink, acceptShareCode } from "../../services/vacationService";
+import { listVacations, createShareLink, acceptShareCode } from "../../services/vacationService";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -123,17 +123,11 @@ export default function DateCalendarServerRequest({ onVacationsChange, selectedD
     italic: false,
     underline: false,
   });
-  const [openVacationDialog, setOpenVacationDialog] = React.useState(false);
-  const [vacationStart, setVacationStart] = React.useState(null);
-  const [vacationEnd, setVacationEnd] = React.useState(null);
-  const [vacationLocation, setVacationLocation] = React.useState("");
-  const [vacationPeople, setVacationPeople] = React.useState("");
   const [vacations, setVacations] = React.useState([]);
   const [weatherData, setWeatherData] = React.useState(null);
   const [loadingWeather, setLoadingWeather] = React.useState(false);
   const [weatherError, setWeatherError] = React.useState(null);
-  const [isEditingVacation, setIsEditingVacation] = React.useState(false);
-  const [editingVacationId, setEditingVacationId] = React.useState(null);
+
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState("");
   const [sharedVacationData, setSharedVacationData] = React.useState(null);
@@ -491,108 +485,7 @@ END:VCALENDAR`;
     handleCloseDialog();
   };
 
-  const handleOpenVacationDialog = (vacationToEdit = null) => {
-    if (vacationToEdit) {
-      // Bearbeitungsmodus
-      setIsEditingVacation(true);
-      setEditingVacationId(vacationToEdit.id);
-      setVacationStart(dayjs(vacationToEdit.startDate));
-      setVacationEnd(dayjs(vacationToEdit.endDate));
-      setVacationLocation(vacationToEdit.location || "");
-      setVacationPeople(vacationToEdit.people || "");
-      setWeatherData(vacationToEdit.weatherData || null);
-    } else {
-      // Neuer Urlaub
-      setIsEditingVacation(false);
-      setEditingVacationId(null);
-    }
-    setOpenVacationDialog(true);
-  };
 
-  const handleCloseVacationDialog = () => {
-    setOpenVacationDialog(false);
-    setVacationStart(null);
-    setVacationEnd(null);
-    setVacationLocation("");
-    setVacationPeople("");
-    setWeatherData(null);
-    setWeatherError(null);
-    setIsEditingVacation(false);
-    setEditingVacationId(null);
-  };
-
-  const handleSaveVacation = async () => {
-    if (vacationStart && vacationEnd) {
-      const days = [];
-      let currentDay = vacationStart.clone();
-
-      while (
-        currentDay.isBefore(vacationEnd) ||
-        currentDay.isSame(vacationEnd, "day")
-      ) {
-        days.push(currentDay.format("YYYY-MM-DD"));
-        currentDay = currentDay.add(1, "day");
-      }
-
-      try {
-        if (isEditingVacation && editingVacationId) {
-          // Update bestehenden Urlaub via API
-          const updated = await updateVacation(editingVacationId, {
-            start_date: vacationStart.format("YYYY-MM-DD"),
-            end_date: vacationEnd.format("YYYY-MM-DD"),
-            location: vacationLocation,
-            people: vacationPeople,
-          });
-          
-          // Update local state
-          setVacations((prev) => 
-            prev.map((v) => 
-              v.id === editingVacationId
-                ? {
-                    id: updated.id,
-                    startDate: updated.start_date,
-                    endDate: updated.end_date,
-                    location: updated.location,
-                    people: updated.people,
-                    weatherData: weatherData,
-                    days: days,
-                  }
-                : v
-            )
-          );
-          setSnackbarMessage("Urlaub aktualisiert!");
-          setSnackbarOpen(true);
-        } else {
-          // Speichere neuen Urlaub via API
-          const created = await createVacation({
-            start_date: vacationStart.format("YYYY-MM-DD"),
-            end_date: vacationEnd.format("YYYY-MM-DD"),
-            location: vacationLocation,
-            people: vacationPeople,
-          });
-          
-          const vacation = {
-            id: created.id,
-            startDate: created.start_date,
-            endDate: created.end_date,
-            location: created.location,
-            people: created.people,
-            weatherData: weatherData,
-            days: days,
-          };
-
-          setVacations((prev) => [...prev, vacation]);
-          setSnackbarMessage("Urlaub erstellt!");
-          setSnackbarOpen(true);
-        }
-      } catch (error) {
-        console.error("Fehler beim Speichern des Urlaubs:", error);
-        setSnackbarMessage("Fehler beim Speichern des Urlaubs");
-        setSnackbarOpen(true);
-      }
-    }
-    handleCloseVacationDialog();
-  };
 
   // Helper Funktionen für react-calendar
   const getTileClassName = ({ date, view }) => {
@@ -972,36 +865,7 @@ END:VCALENDAR`;
               }}
             />
           </Paper>
-          <Box
-            sx={{ display: "flex", gap: 1, mt: 3, justifyContent: "center" }}
-          >
-            <Button 
-              variant="outlined" 
-              color="primary" 
-              size="small"
-              disabled={!(() => {
-                const dayKey = selectedDay?.format("YYYY-MM-DD");
-                return vacations.find(v => v.days.includes(dayKey));
-              })()}
-              onClick={() => {
-                const dayKey = selectedDay?.format("YYYY-MM-DD");
-                const vacation = vacations.find(v => v.days.includes(dayKey));
-                if (vacation) {
-                  handleOpenVacationDialog(vacation);
-                }
-              }}
-            >
-              Urlaub bearbeiten
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              size="small"
-              onClick={() => handleOpenVacationDialog()}
-            >
-              Urlaub hinzufügen
-            </Button>
-          </Box>
+
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Abbrechen</Button>
@@ -1011,101 +875,7 @@ END:VCALENDAR`;
         </DialogActions>
       </Dialog>
 
-      <Dialog
-        open={openVacationDialog}
-        onClose={handleCloseVacationDialog}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>{isEditingVacation ? "Urlaub bearbeiten" : "Urlaub hinzufügen"}</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 3, mt: 2 }}>
-            <DatePicker
-              label="Startdatum"
-              value={vacationStart}
-              onChange={(newValue) => setVacationStart(newValue)}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  variant: "outlined",
-                },
-              }}
-            />
-            <DatePicker
-              label="Enddatum"
-              value={vacationEnd}
-              onChange={(newValue) => setVacationEnd(newValue)}
-              minDate={vacationStart}
-              slotProps={{
-                textField: {
-                  fullWidth: true,
-                  variant: "outlined",
-                },
-              }}
-            />
-            <Box>
-              <TextField
-                label="Ort"
-                value={vacationLocation}
-                onChange={(e) => setVacationLocation(e.target.value)}
-                fullWidth
-                variant="outlined"
-                placeholder="z.B. Mallorca, Italien, Berlin"
-              />
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={loadingWeather ? <CircularProgress size={16} /> : <WbSunnyIcon />}
-                onClick={() => fetchWeather(vacationLocation)}
-                disabled={!vacationLocation || loadingWeather}
-                sx={{ mt: 1 }}
-              >
-                Wetter abrufen
-              </Button>
-              {weatherData && (
-                <Box sx={{ mt: 2 }}>
-                  <Alert severity="success" sx={{ mb: 1 }}>
-                    Wetter für {weatherData.locationName}
-                  </Alert>
-                  <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-                    <Chip
-                      label={`${weatherData.temp}°C`}
-                      color="primary"
-                    />
-                    <Chip label={weatherData.description} />
-                    <Chip label={`Gefühlt: ${weatherData.feelsLike}°C`} variant="outlined" />
-                    <Chip label={`${weatherData.humidity}% Luftfeuchtigkeit`} variant="outlined" />
-                    <Chip label={`Wind: ${weatherData.windSpeed} km/h`} variant="outlined" />
-                  </Box>
-                </Box>
-              )}
-              {weatherError && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {weatherError}
-                </Alert>
-              )}
-            </Box>
-            <TextField
-              label="Personen"
-              value={vacationPeople}
-              onChange={(e) => setVacationPeople(e.target.value)}
-              fullWidth
-              variant="outlined"
-              placeholder="z.B. Familie, Freunde, Partner"
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseVacationDialog}>Abbrechen</Button>
-          <Button
-            onClick={handleSaveVacation}
-            variant="contained"
-            disabled={!vacationStart || !vacationEnd}
-          >
-            Speichern
-          </Button>
-        </DialogActions>
-      </Dialog>
+
 
       <Menu
         anchorEl={calendarMenuAnchor}

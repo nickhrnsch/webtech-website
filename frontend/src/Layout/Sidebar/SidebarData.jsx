@@ -14,8 +14,8 @@ export const SidebarData = [
     path: "/calendar"
   },
   {
-    title: "Urlaub planen",
-    icon: new URL('./SidebarIcons/CalendarIconBlack.svg', import.meta.url).href,
+    title: "Urlaubsplanung",
+    icon: new URL('./SidebarIcons/PlanungIcon.svg', import.meta.url).href,
     type: "image",
     path: "/vacation-plan"
   },
