@@ -61,6 +61,7 @@ function VacationList({ vacations, loading, error, onVacationChange, onError }) 
   const [saving, setSaving] = useState(false);
   const [calendarMenuAnchor, setCalendarMenuAnchor] = useState(null);
   const [selectedVacationForExport, setSelectedVacationForExport] = useState(null);
+  const [showPastVacations, setShowPastVacations] = useState(true);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
@@ -234,14 +235,29 @@ END:VCALENDAR`;
     new Date(a.start_date) - new Date(b.start_date)
   );
 
+  // Filtere vergangene Urlaube, wenn aktiviert
+  const today = dayjs().startOf('day');
+  const filteredVacations = showPastVacations 
+    ? sortedVacations 
+    : sortedVacations.filter(v => dayjs(v.end_date).isAfter(today) || dayjs(v.end_date).isSame(today, 'day'));
+
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
       <Box>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 2, mb: 2 }}>
           <Typography variant="h6">Meine Urlaube</Typography>
-          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={openAddDialog}>
-            Urlaub hinzufügen
-          </Button>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Button 
+              variant={showPastVacations ? "outlined" : "contained"} 
+              onClick={() => setShowPastVacations(!showPastVacations)}
+              size="small"
+            >
+              {showPastVacations ? "Vergangene ausblenden" : "Vergangene einblenden"}
+            </Button>
+            <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={openAddDialog}>
+              Urlaub hinzufügen
+            </Button>
+          </Box>
         </Box>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
@@ -254,6 +270,8 @@ END:VCALENDAR`;
           </Box>
         ) : vacations.length === 0 ? (
           <Typography color="text.secondary">Keine Urlaube. Füge einen hinzu.</Typography>
+        ) : filteredVacations.length === 0 ? (
+          <Typography color="text.secondary">Keine {showPastVacations ? "" : "zukünftigen "}Urlaube vorhanden.</Typography>
         ) : (
           <TableContainer component={Paper} sx={{ maxHeight: 440 }}>
             <Table stickyHeader aria-label="sticky table">
@@ -269,7 +287,7 @@ END:VCALENDAR`;
                 </TableRow>
               </TableHead>
               <TableBody>
-                {sortedVacations.map((v) => (
+                {filteredVacations.map((v) => (
                   <TableRow key={v.id} hover>
                     <TableCell>{formatDate(v.start_date)}</TableCell>
                     <TableCell>{formatDate(v.end_date)}</TableCell>

@@ -32,7 +32,8 @@
 .sidebar-header-icon {
     width: 32px;
     height: 32px;
-    
+    filter: invert(37%) sepia(93%) saturate(1068%) hue-rotate(130deg) brightness(91%) contrast(101%);
+    /* Das UrlaubsplanerIcon in eine grüne Farbe färben passend zum Design */
 }
 
 .sidebar h2 {
@@ -86,22 +87,22 @@
 
 .sidebar-button:hover {
     background-color: #ffffff;
-    border: #1976d2 1px solid;
+    border: #00796b 1px solid;
     transform: translateY(-0.5px);
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.12);
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.25);
 }
 
 .sidebar-button:focus {
     outline: none;
-    border-color:#1976d2;
-    box-shadow: 0 0 0 3px #1976d238;
+    border-color:#00796b;
+    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.35);
 }
 
 .sidebar-button.active {
     background-color: #ffffff;
     color:#2c3e50;
-    border-color: #1976d2;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+    border-color: #00796b;
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.3);
 }
 
 
@@ -148,7 +149,7 @@
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #1976d2;
+    border: 2px solid #00796b;
 }
 
 .user-info {
@@ -198,13 +199,13 @@
     background-color: #ffffff;
     transition: all 0.3s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    border: 1px solid #1976d2;
+    border: 1px solid #00796b;
 }
 
 .sidebar-user-profile:focus {
     outline: none;
-    border-color:#1976d2;
-    box-shadow: 0 0 0 3px #1976d238;
+    border-color:#00796b;
+    box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.35);
 }
 
 
@@ -222,7 +223,7 @@
 .profile-popup-expanded {
     background-color: #ffffff;
     border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(25, 118, 210, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 121, 107, 0.15);
     overflow: hidden;
     height: 100%;
     display: flex;
@@ -230,7 +231,7 @@
 }
 
 .profile-popup-header {
-    background: #1976d2;
+    background: #00796b;
     padding: 25px;
     display: flex;
     justify-content: space-between;
@@ -245,7 +246,7 @@
 }
 
 .profile-popup-close {
-    background: rgba(25, 118, 210, 0.2);
+    background: rgba(0, 121, 107, 0.2);
     border: none;
     color: white;
     font-size: 28px;
@@ -262,7 +263,7 @@
 }
 
 .profile-popup-close:hover {
-    background: rgba(25, 118, 210, 0.3);
+    background: rgba(0, 121, 107, 0.3);
 }
 
 .profile-popup-body {
@@ -281,8 +282,8 @@
     width: 80px;
     height: 80px;
     border-radius: 50%;
-    border: 3px solid #1976d2;
-    box-shadow: 0 4px 8px rgba(25, 118, 210, 0.3);
+    border: 3px solid #00796b;
+    box-shadow: 0 4px 8px rgba(0, 121, 107, 0.3);
 }
 
 .profile-details {
@@ -328,7 +329,7 @@
 .profile-detail-item input:focus {
     background-color: #ffffff;
     border-radius: 4px;
-    box-shadow: 0 0 0 2px #1976d2;
+    box-shadow: 0 0 0 2px #00796b;
 }
 
 /* ---------------------------Dark Mode (data-theme="dark")--------------------------------- */

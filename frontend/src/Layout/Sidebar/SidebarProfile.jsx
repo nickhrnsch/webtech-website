@@ -111,7 +111,7 @@ function SidebarProfile() {
                 <button className="sidebar-user-profile" onClick={handleClick}>
                     <div className="user-avatar">
                         <img 
-                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1976d2&color=fff&size=48`}
+                            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=00796b&color=fff&size=48`}
                             alt="User Avatar" 
                         />
                     </div>
@@ -133,7 +133,7 @@ function SidebarProfile() {
                             <>
                                 <div className="profile-avatar-large">
                                     <img 
-                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=1976d2&color=fff&size=80`}
+                                        src={`https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=00796b&color=fff&size=80`}
                                         alt="User Avatar" 
                                     />
                                 </div>
@@ -193,7 +193,7 @@ function SidebarProfile() {
                                             style={{
                                                 flex: 1,
                                                 padding: '10px 20px',
-                                                backgroundColor: (saving || !hasChanges()) ? '#cccccc' : '#1976d2',
+                                                backgroundColor: (saving || !hasChanges()) ? '#cccccc' : '#00796b',
                                                 color: 'white',
                                                 border: 'none',
                                                 borderRadius: '8px',
