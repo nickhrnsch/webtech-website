@@ -61,7 +61,7 @@ function VacationList({ vacations, loading, error, onVacationChange, onError }) 
   const [saving, setSaving] = useState(false);
   const [calendarMenuAnchor, setCalendarMenuAnchor] = useState(null);
   const [selectedVacationForExport, setSelectedVacationForExport] = useState(null);
-  const [showPastVacations, setShowPastVacations] = useState(true);
+  const [showPastVacations, setShowPastVacations] = useState(false);
 
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);

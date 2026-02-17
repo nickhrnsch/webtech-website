@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { listVacations } from "../../services/vacationService";
+import dayjs from "dayjs";
 import {
   Paper,
   Table,
@@ -13,7 +14,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 
-function UpcomingVacationsWidget({ vacations: externalVacations, refreshTrigger }) {
+function UpcomingVacationsWidget({ vacations: externalVacations, refreshTrigger, onDateClick }) {
   const [vacations, setVacations] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -82,7 +83,17 @@ function UpcomingVacationsWidget({ vacations: externalVacations, refreshTrigger 
               const endDate = new Date(vacation.end_date);
               
               return (
-                <TableRow key={vacation.id} hover>
+                <TableRow 
+                  key={vacation.id} 
+                  hover
+                  onClick={() => onDateClick && onDateClick(dayjs(vacation.start_date))}
+                  sx={{ 
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: (t) => t.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.04)'
+                    }
+                  }}
+                >
                   <TableCell>
                     {startDate.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })}
                   </TableCell>

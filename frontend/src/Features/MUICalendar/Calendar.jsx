@@ -703,6 +703,8 @@ END:VCALENDAR`;
           value={selectedDate ? selectedDate.toDate() : new Date()}
           onChange={handleCalendarClick}
           onClickDay={handleCalendarClick}
+          onActiveStartDateChange={({ activeStartDate }) => setActiveStartDate(activeStartDate)}
+          activeStartDate={activeStartDate}
           tileClassName={getTileClassName}
           tileContent={getTileContent}
           locale="de-DE"

@@ -17,7 +17,7 @@ function Home() {
   return (
     <Fenster title="Dashboard">
       <Widget className="upcoming-vacations-widget">
-        <UpcomingVacationsWidget vacations={vacations} />
+        <UpcomingVacationsWidget vacations={vacations} onDateClick={handleDateClick} />
       </Widget>
       <Widget className="calendar-widget">
         <div className="calendar-events-container">
