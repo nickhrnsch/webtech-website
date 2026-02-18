@@ -20,13 +20,13 @@ export const SidebarData = [
     path: "/vacation-plan"
   },
   {
-    title: "About",
+    title: "Über uns",
     icon: new URL('./SidebarIcons/AboutIcon.svg', import.meta.url).href,
     type: "image",
     path: "/about"
   },
   {
-    title: "Contact",
+    title: "Kontakt",
     icon: new URL('./SidebarIcons/KontaktIcon.svg', import.meta.url).href,
     type: "image",
     path: "/contact"
