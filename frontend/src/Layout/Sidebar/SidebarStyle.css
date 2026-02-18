@@ -36,6 +36,14 @@
     /* Das UrlaubsplanerIcon in eine grüne Farbe färben passend zum Design */
 }
 
+.sidebar-logo {
+    width: 300px; 
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    object-fit: contain;
+}
+
 .sidebar h2 {
     font-size: 28px;
     font-weight: 700;

@@ -6,7 +6,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import "./SidebarStyle.css";
 import { SidebarData } from "./SidebarData";
 import SidebarProfile from "./SidebarProfile";
-import CalenderIcon from "./SidebarIcons/CalenderIcon.png";
+import Logo from "./SidebarIcons/Logo.png";
 import { useThemeMode } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -23,8 +23,7 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <img src={CalenderIcon} alt="Kalender" className="sidebar-header-icon" />
-        <h2>Urlaubsplaner</h2>
+        <img src={Logo} alt="Logo" className="sidebar-logo" />
       </div>
       <ul>
         {SidebarData.map((item, index) => {
