@@ -37,7 +37,8 @@
 }
 
 .sidebar-logo {
-    width: 300px; 
+    width: 100%; 
+    max-width: 380px; /* Optional: Maximale Breite festlegen */
     height: auto;
     display: block;
     margin: 0 auto;
