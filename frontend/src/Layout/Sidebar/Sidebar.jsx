@@ -7,6 +7,7 @@ import "./SidebarStyle.css";
 import { SidebarData } from "./SidebarData";
 import SidebarProfile from "./SidebarProfile";
 import Logo from "./SidebarIcons/Logo.png";
+import logoSound from "./SidebarSounds/LogoSound.mp3";
 import { useThemeMode } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 
@@ -16,6 +17,14 @@ function Sidebar() {
   const { mode, toggleColorMode } = useThemeMode();
   const { user } = useAuth();
 
+  const handleLogoClick = () => {
+    const audio = new Audio(logoSound);
+    audio.volume = 1;
+    audio.play().catch(() => {
+      // Fallback falls Browser Audio blockiert (z. B. vor erster Nutzerinteraktion)
+    });
+  };
+
   const handleNavigation = (path) => {
     navigate(path);
   };
@@ -23,7 +32,14 @@ function Sidebar() {
   return (
     <div className="sidebar">
       <div className="sidebar-header">
-        <img src={Logo} alt="Logo" className="sidebar-logo" />
+        <button
+          type="button"
+          className="sidebar-logo-button"
+          onClick={handleLogoClick}
+          aria-label="Logo"
+        >
+          <img src={Logo} alt="Logo" className="sidebar-logo" />
+        </button>
       </div>
       <ul>
         {SidebarData.map((item, index) => {
