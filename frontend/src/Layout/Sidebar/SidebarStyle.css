@@ -29,13 +29,6 @@
     padding-left: 5%;
 }
 
-.sidebar-header-icon {
-    width: 32px;
-    height: 32px;
-    filter: invert(37%) sepia(93%) saturate(1068%) hue-rotate(130deg) brightness(91%) contrast(101%);
-    /* Das UrlaubsplanerIcon in eine grüne Farbe färben passend zum Design */
-}
-
 .sidebar-logo-button {
     background: none;
     border: none;
@@ -47,7 +40,7 @@
 
 .sidebar-logo {
     width: 100%; 
-    max-width: 380px; /* Optional: Maximale Breite festlegen */
+    max-width: 380px; /* Maximale Breite festlegen */
     height: auto;
     display: block;
     margin: 0 auto;
@@ -451,3 +444,7 @@
     color: rgba(255, 255, 255, 0.87);
 }
 
+[data-theme="dark"] .sidebar-icon {
+    filter: brightness(0) invert(1);
+    /* Macht die Icons weiß im Dark Mode */
+}
