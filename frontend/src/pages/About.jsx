@@ -21,8 +21,8 @@ function About() {
           </ul>
           <h3>Wie lege ich Urlaube an?</h3>
           <ol>
-            <li>Öffne das Dashboard (Startseite) und nutze den MUI-Kalender.</li>
-            <li>Klicke auf das Startdatum im Kalender und wähle „Urlaub erstellen“.</li>
+            <li>Navigiere vom Dashboard zur Urlaubsplanung.</li>
+            <li>Verwende den Urlaub Hinzufügen Button in der oberen rechten Ecke.</li>
             <li>Trage Zeitraum, Ort und Personen ein und speichere den Urlaub.</li>
             <li>Der Urlaub erscheint anschließend im kleinen Kalender auf dem Dashboard und im großen Kalender unter „Kalender“.</li>
           </ol>
