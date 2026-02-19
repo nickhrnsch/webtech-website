@@ -146,3 +146,16 @@
     column-count: 1;
   }
 }
+
+@media (max-width: 800px) {
+  .fenster-container {
+    display: none;
+  }
+}
+
+@media (max-width: 1300px) {
+  .fenster-widget-area {
+    column-count: 1; /* Widgets untereinander anzeigen */
+  }
+}
+

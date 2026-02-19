@@ -73,6 +73,7 @@
 
 .sidebar-button {
     width: 90%;
+    min-width: 200px;
     padding: 15px;
     background-color:#f9f9f9;
     border-radius: 12px;
