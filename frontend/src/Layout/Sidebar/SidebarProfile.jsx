@@ -186,7 +186,7 @@ function SidebarProfile() {
                                         <strong>Status:</strong>
                                         <span className="status-online">Online</span>
                                     </div>
-                                    <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+                                    <div className="profile-buttons-container">
                                         <button 
                                             onClick={handleSave} 
                                             disabled={saving || !hasChanges()}
