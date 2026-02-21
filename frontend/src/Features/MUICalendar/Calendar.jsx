@@ -33,73 +33,11 @@ import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-
-// Deutsche Feiertage (vereinfachte Liste, kann erweitert werden)
-const holidays = [
-  "2026-01-01", // Neujahr
-  "2026-04-03", // Karfreitag
-  "2026-04-06", // Ostermontag
-  "2026-05-01", // Tag der Arbeit
-  "2026-05-14", // Christi-Himmelfahrt
-  "2026-05-25", // Pfingstmontag
-  "2026-06-04", // Fronleichnam
-  "2026-10-03", // Tag der deutschen Einheit
-  "2026-11-01", // Allerheiligen
-  "2026-12-25", // 1. Weihnachstag
-  "2026-12-26", // 2. Weihnachstag
-  "2027-01-01", // Neujahr
-  "2027-03-26", // Karfreitag
-  "2027-03-29", // Ostermontag
-  "2027-05-01", // Tag der Arbeit
-  "2027-05-06", // Christi-Himmelfahrt
-  "2027-05-17", // Pfingstmontag
-  "2027-05-27", // Fronleichnam
-  "2027-10-03", // Tag der deutschen Einheit
-  "2027-11-01", // Allerheiligen
-  "2027-12-25", // 1. Weihnachstag
-  "2027-12-26", // 2. Weihnachstag
-  "2028-01-01", // Neujahr
-  "2028-04-14", // Karfreitag
-  "2028-04-17", // Ostermontag
-  "2028-05-01", // Tag der Arbeit
-  "2028-05-25", // Christi-Himmelfahrt
-  "2028-06-05", // Pfingstmontag
-  "2028-06-15", // Fronleichnam
-  "2028-10-03", // Tag der deutschen Einheit
-  "2028-11-01", // Allerheiligen
-  "2028-12-25", // 1. Weihnachstag
-  "2028-12-26", // 2. Weihnachstag
-  "2029-01-01", // Neujahr
-  "2029-03-30", // Karfreitag
-  "2029-04-02", // Ostermontag
-  "2029-05-01", // Tag der Arbeit
-  "2029-05-10", // Christi-Himmelfahrt
-  "2029-05-21", // Pfingstmontag
-  "2029-05-31", // Fronleichnam
-  "2029-10-03", // Tag der deutschen Einheit
-  "2029-11-01", // Allerheiligen
-  "2029-12-25", // 1. Weihnachstag
-  "2029-12-26", // 2. Weihnachstag
-  "2030-01-01", // Neujahr
-  "2030-04-19", // Karfreitag
-  "2030-04-22", // Ostermontag
-  "2030-05-01", // Tag der Arbeit
-  "2030-05-30", // Christi-Himmelfahrt
-  "2030-06-10", // Pfingstmontag
-  "2030-06-20", // Fronleichnam
-  "2030-10-03", // Tag der deutschen Einheit
-  "2030-11-01", // Allerheiligen
-  "2030-12-25", // 1. Weihnachstag
-  "2030-12-26", // 2. Weihnachstag
-];
+import { fetchPublicHolidaysForYears, getDefaultHolidayYears } from "../../services/holidayService";
 
 function isWeekend(day) {
   const dayOfWeek = day.day();
   return dayOfWeek === 0 || dayOfWeek === 6; // 0 = Sonntag, 6 = Samstag
-}
-
-function isHoliday(dayKey) {
-  return holidays.includes(dayKey);
 }
 
 function getSeasonEmoji(month) {
@@ -139,6 +77,7 @@ export default function DateCalendarServerRequest({ onVacationsChange, selectedD
   const [activeStartDate, setActiveStartDate] = React.useState(
     selectedDate ? selectedDate.toDate() : new Date()
   );
+  const [holidayDates, setHolidayDates] = React.useState(() => new Set());
 
   // Update activeStartDate when selectedDate changes from outside (e.g., NextEventsList)
   useEffect(() => {
@@ -146,6 +85,36 @@ export default function DateCalendarServerRequest({ onVacationsChange, selectedD
       setActiveStartDate(selectedDate.toDate());
     }
   }, [selectedDate]);
+
+  useEffect(() => {
+    let isCancelled = false;
+
+    async function loadHolidays() {
+      try {
+        const baseYear = dayjs(activeStartDate).year();
+        const years = getDefaultHolidayYears(baseYear);
+        const loadedHolidays = await fetchPublicHolidaysForYears(years);
+
+        if (isCancelled) {
+          return;
+        }
+
+        setHolidayDates(new Set(loadedHolidays.map((holiday) => holiday.date)));
+      } catch (error) {
+        console.error("Fehler beim Laden der Feiertage:", error);
+        if (!isCancelled) {
+          setSnackbarMessage("Feiertage konnten nicht geladen werden");
+          setSnackbarOpen(true);
+        }
+      }
+    }
+
+    loadHolidays();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [activeStartDate]);
 
   // Lade Urlaube beim Mount
   useEffect(() => {
@@ -498,7 +467,7 @@ END:VCALENDAR`;
     
     const classes = [];
     
-    if (isHoliday(dayKey)) {
+    if (holidayDates.has(dayKey)) {
       classes.push('holiday-tile');
     }
     

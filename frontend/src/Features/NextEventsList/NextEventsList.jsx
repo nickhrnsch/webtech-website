@@ -9,57 +9,33 @@ import BeachAccessIcon from '@mui/icons-material/BeachAccess';
 import Divider from '@mui/material/Divider';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-
-// Deutsche Feiertage
-export const holidays = [
-  { date: "2026-01-01", name: "Neujahr" },
-  { date: "2026-04-03", name: "Karfreitag" },
-  { date: "2026-04-06", name: "Ostermontag" },
-  { date: "2026-05-01", name: "Tag der Arbeit" },
-  { date: "2026-05-14", name: "Christi Himmelfahrt" },
-  { date: "2026-05-25", name: "Pfingstmontag" },
-  { date: "2026-10-03", name: "Tag der Deutschen Einheit" },
-  { date: "2026-12-25", name: "1. Weihnachtstag" },
-  { date: "2026-12-26", name: "2. Weihnachtstag" },
-  { date: "2027-01-01", name: "Neujahr" },
-  { date: "2027-03-26", name: "Karfreitag" },
-  { date: "2027-03-29", name: "Ostermontag" },
-  { date: "2027-05-01", name: "Tag der Arbeit" },
-  { date: "2027-05-06", name: "Christi Himmelfahrt" },
-  { date: "2027-05-17", name: "Pfingstmontag" },
-  { date: "2027-10-03", name: "Tag der Deutschen Einheit" },
-  { date: "2027-12-25", name: "1. Weihnachtstag" },
-  { date: "2027-12-26", name: "2. Weihnachtstag" },
-  { date: "2028-01-01", name: "Neujahr" },
-  { date: "2028-04-14", name: "Karfreitag" },
-  { date: "2028-04-17", name: "Ostermontag" },
-  { date: "2028-05-01", name: "Tag der Arbeit" },
-  { date: "2028-05-25", name: "Christi Himmelfahrt" },
-  { date: "2028-06-05", name: "Pfingstmontag" },
-  { date: "2028-10-03", name: "Tag der Deutschen Einheit" },
-  { date: "2028-12-25", name: "1. Weihnachtstag" },
-  { date: "2028-12-26", name: "2. Weihnachtstag" },
-  { date: "2029-01-01", name: "Neujahr" },
-  { date: "2029-03-30", name: "Karfreitag" },
-  { date: "2029-04-02", name: "Ostermontag" },
-  { date: "2029-05-01", name: "Tag der Arbeit" },
-  { date: "2029-05-10", name: "Christi Himmelfahrt" },
-  { date: "2029-05-21", name: "Pfingstmontag" },
-  { date: "2029-10-03", name: "Tag der Deutschen Einheit" },
-  { date: "2029-12-25", name: "1. Weihnachtstag" },
-  { date: "2029-12-26", name: "2. Weihnachtstag" },
-  { date: "2030-01-01", name: "Neujahr" },
-  { date: "2030-04-19", name: "Karfreitag" },
-  { date: "2030-04-22", name: "Ostermontag" },
-  { date: "2030-05-01", name: "Tag der Arbeit" },
-  { date: "2030-05-30", name: "Christi Himmelfahrt" },
-  { date: "2030-06-10", name: "Pfingstmontag" },
-  { date: "2030-10-03", name: "Tag der Deutschen Einheit" },
-  { date: "2030-12-25", name: "1. Weihnachtstag" },
-  { date: "2030-12-26", name: "2. Weihnachtstag" },
-];
+import { fetchPublicHolidaysForYears, getDefaultHolidayYears } from '../../services/holidayService';
 
 export default function NextEventsList({ vacations = [], onDateClick }) {
+  const [holidays, setHolidays] = React.useState([]);
+
+  React.useEffect(() => {
+    let isCancelled = false;
+
+    async function loadHolidays() {
+      try {
+        const years = getDefaultHolidayYears(dayjs().year());
+        const loadedHolidays = await fetchPublicHolidaysForYears(years);
+        if (!isCancelled) {
+          setHolidays(loadedHolidays);
+        }
+      } catch (error) {
+        console.error('Fehler beim Laden der Feiertage:', error);
+      }
+    }
+
+    loadHolidays();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
+
   const getNextEvents = () => {
     const today = dayjs();
     const eventsList = [];
