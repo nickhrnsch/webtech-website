@@ -22,9 +22,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 
-//einkommentieren falls notwendig
-//const GOOGLE_MAPS_API_KEY = 'AIzaSyC4hKVIGMMVAQuU_Yt0RwJ89pdAMy5grOQ';
-const GOOGLE_MAPS_API_KEY = 'auskommentieren falls notwendig';
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 
 function GoogleMaps({ vacations = [] }) {
@@ -67,6 +65,11 @@ function GoogleMaps({ vacations = [] }) {
   // Google Maps laden
   useEffect(() => {
     const loadGoogleMapsScript = () => {
+      if (!GOOGLE_MAPS_API_KEY) {
+        setError('Kein Google Maps API-Schlüssel konfiguriert (VITE_GOOGLE_MAPS_API_KEY fehlt).');
+        return;
+      }
+
       if (window.google) {
         initializeMap();
         return;
@@ -78,7 +81,7 @@ function GoogleMaps({ vacations = [] }) {
       script.defer = true;
       script.onload = () => initializeMap();
       script.onerror = () => {
-        setError('Fehler beim Laden von Google Maps. Bitte überprüfen Sie Ihren API-Schlüssel.');
+        setError('Fehler beim Laden von Google Maps. Bitte API-Schlüssel prüfen.');
       };
       document.head.appendChild(script);
     };

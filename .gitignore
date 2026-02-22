@@ -1,0 +1,32 @@
+# Environment variables (Secrets nie committen!)
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+backend/venv/
+backend/venvvenv/
+backend/env/
+backend/ENV/
+backend/.venv
+
+# Datenbank
+*.db
+*.sqlite
+*.sqlite3
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/extensions.json
+.idea
