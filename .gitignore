@@ -27,6 +27,7 @@ frontend/dist-ssr/
 # OS / Editor
 .DS_Store
 Thumbs.db
+.cursor/
 .vscode/*
 !.vscode/extensions.json
 .idea

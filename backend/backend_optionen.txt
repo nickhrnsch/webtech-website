@@ -1,5 +1,0 @@
-Ich würde eines dieser nutzen:
-FastAPI
-Flask
-
-Beide sind mit Python.
