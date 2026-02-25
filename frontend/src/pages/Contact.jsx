@@ -18,9 +18,8 @@ function Contact() {
               Unser Support-Team steht Ihnen bei technischen Fragen, Feature-Wünschen 
               oder allgemeinen Anliegen zur Verfügung.
             </p>
-            <p><strong>Email:</strong> info@urlaubsplaner.de</p>
-            <p><strong>Telefon:</strong> +49 123 456789</p>
-            <p><strong>Adresse:</strong> Musterstraße 123, 12345 Musterstadt</p>
+            <p><strong>Email:</strong> holilingo.kontakt@gmail.com</p>
+            <p><strong>Adresse:</strong> Toulouser Allee 53, 40476 Düsseldorf</p>
           </div>
 
           <div style={{ marginTop: '30px' }}>
